@@ -1,0 +1,19 @@
+{
+  "extends": [
+    "reproduction"
+  ],
+  "hints": {
+    "axe/forms": [
+      "on",
+      {
+        "autocomplete-valid": "on"
+      }
+    ],
+    "axe/name-role-value": [
+      "on",
+      {
+        "button-name": "on"
+      }
+    ]
+  }
+}
