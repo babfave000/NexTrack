@@ -24,14 +24,14 @@ export const migrations: Migration[] = [
       if (userCount === 0) {
         try {
           await db.users.add({
-            email: 'admin@nextrack.com',
+            email: 'admin@nextrack.ink',
             password: 'admin123',
             name: 'Administrator',
             role: 'admin',
             createdAt: new Date(),
             updatedAt: new Date()
           });
-          console.log('✅ Default admin user created: admin@nextrack.com');
+          console.log('✅ Default admin user created: admin@nextrack.ink');
         } catch (error) {
           // If user already exists (constraint error), just log it
           if (typeof error === 'object' && error !== null && 'name' in error && (error as { name: string }).name === 'ConstraintError') {

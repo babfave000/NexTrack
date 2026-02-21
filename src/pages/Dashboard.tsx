@@ -137,6 +137,12 @@ export default function Dashboard() {
           <p className="text-gray-600 mt-1">Welcome, {user?.name}! 👋</p>
         </div>
         
+        <div className="flex items-center grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <Link to="/guideline" className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow text-center group">
+          <span className="text-sm font-medium text-gray-700">Guideline</span>
+          </Link>
+        </div>
+
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600">Time Range:</span>
           <select

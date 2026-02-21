@@ -205,7 +205,6 @@ export default function LoginForm() {
           {isLogin && (
             <div className="text-center">
               <p className="text-xs text-gray-500">
-                {/* Demo account: admin@nextrack.com / admin123 */}
               </p>
             </div>
           )}
