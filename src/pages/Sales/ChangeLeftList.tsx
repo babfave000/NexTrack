@@ -64,20 +64,18 @@ export default function ChangeLeftList({ userId }: ChangeLeftListProps) {
   const totalUncollected = changeRecords
     .filter(record => record.status === 'uncollected')
     .reduce((sum, record) => {
-      // Convert to cents to avoid floating point errors
+      // Use integer math to avoid floating point errors
       const amountInCents = Math.round(record.amount * 100);
-      const sumInCents = Math.round(sum * 100);
-      return (sumInCents + amountInCents) / 100;
-    }, 0);
+      return sum + amountInCents;
+    }, 0) / 100;
 
   const totalCollected = changeRecords
     .filter(record => record.status === 'collected')
     .reduce((sum, record) => {
-      // Convert to cents to avoid floating point errors
+      // Use integer math to avoid floating point errors
       const amountInCents = Math.round(record.amount * 100);
-      const sumInCents = Math.round(sum * 100);
-      return (sumInCents + amountInCents) / 100;
-    }, 0);
+      return sum + amountInCents;
+    }, 0) / 100;
 
   // FIXED: Format currency with proper rounding
   const formatCurrency = (amount: number) => {
