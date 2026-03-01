@@ -341,9 +341,9 @@ class NexTrackDB extends Dexie {
     this.version(5).stores({
       users: '++id, &email, createdAt',
       sessions: '++id, userId, token, expiresAt',
-      organizations: '++id, name, ownerId, createdAt',
-      userOrganizations: '++id, userId, organizationId, role',
-      products: '++id, name, sku, brand, supplier, userId, organizationId',
+      organizations: '++id, name, ownerId, createdAt, updatedAt',
+      userOrganizations: '++id, userId, organizationId, role, joinedAt',
+      products: '++id, name, description, sku, brand, category, supplier, costPrice, salePrice, stock, minStock, userId, organizationId, createdAt, updatedAt',
       salesOrders: '++id, customer, date, status, paymentStatus, userId, organizationId',
       purchaseOrders: '++id, supplier, date, status, paymentStatus, userId, organizationId',
       invoices: '++id, relatedOrderId, type, date, userId, organizationId',
@@ -355,11 +355,14 @@ class NexTrackDB extends Dexie {
       settings: '&key, value, userId, organizationId',
       changeLeft: '++id, orderId, customerName, status, createdAt, userId, organizationId',
     }).upgrade(trans => {
-      // Add default values for new UserProfile fields
+      // Add default values for new UserProfile fields only if they don't exist
       return trans.table('userProfile').toCollection().modify(profile => {
         profile.showLowStockWarnings = profile.showLowStockWarnings !== undefined ? profile.showLowStockWarnings : true;
         profile.autoBackupFrequency = profile.autoBackupFrequency || 7;
-        profile.lowStockThreshold = profile.lowStockThreshold || 5;
+        // Only set lowStockThreshold if it's not already set
+        if (profile.lowStockThreshold === undefined || profile.lowStockThreshold === 0) {
+          profile.lowStockThreshold = 5;
+        }
       });
     });
 
@@ -367,17 +370,17 @@ class NexTrackDB extends Dexie {
     this.version(6).stores({
       users: '++id, &email, createdAt',
       sessions: '++id, userId, token, expiresAt',
-      organizations: '++id, name, ownerId, createdAt',
-      userOrganizations: '++id, userId, organizationId, role',
-      products: '++id, name, sku, brand, supplier, userId, organizationId',
+      organizations: '++id, name, ownerId, createdAt, updatedAt',
+      userOrganizations: '++id, userId, organizationId, role, joinedAt',
+      products: '++id, name, description, sku, brand, category, supplier, costPrice, salePrice, stock, minStock, userId, organizationId, createdAt, updatedAt',
       salesOrders: '++id, customer, date, status, paymentStatus, userId, organizationId',
       purchaseOrders: '++id, supplier, date, status, paymentStatus, userId, organizationId',
       invoices: '++id, relatedOrderId, type, date, userId, organizationId',
       inventoryHistory: '++id, productId, date, reason, userId, organizationId',
       categories: '++id, name, userId, organizationId',
       brands: '++id, name, userId, organizationId',
-      suppliers: '++id, name, userId, organizationId',
-      userProfile: 'id, userId, organizationId',
+      suppliers: '++id, name, address, userId, organizationId, createdAt, updatedAt',
+      userProfile: 'id, userId, organizationId, website, socialLinks, logoUrl',
       settings: '&key, value, userId, organizationId',
       changeLeft: '++id, orderId, customerName, status, createdAt, userId, organizationId',
     }).upgrade(trans => {

@@ -35,7 +35,7 @@ export default function UserProfilePage() {
       
       setIsLoading(true);
       try {
-        const existing = await getUserProfile(userId.toString());
+        const existing = await getUserProfile(`profile-${userId}`);
         if (existing) {
           setProfile(existing);
           setOriginal(existing);
@@ -100,10 +100,12 @@ export default function UserProfilePage() {
     try {
       const profileToSave = {
         ...profile,
-        userId: user.id
+        userId: user.id,
+        id: `profile-${user.id}`, // Use consistent ID format
+        updatedAt: new Date().toISOString()
       };
       
-      await updateUserProfile(profileToSave, user.id.toString());
+      await updateUserProfile(profileToSave, `profile-${user.id}`);
       setSavedMessage('Profile updated successfully');
       setTimeout(() => setSavedMessage(''), 3000);
     } catch (error) {

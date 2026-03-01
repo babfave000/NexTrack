@@ -107,9 +107,12 @@ export default function HelpSupportPage() {
                 <p className="text-gray-600 mb-4">
                   Comprehensive guides and tutorials
                 </p>
-                <button className="text-blue-600 hover:text-blue-700 font-medium">
+                <Link
+                  to="/guideline"
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
                   View Guides
-                </button>
+                </Link>
               </div>
 
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
@@ -120,9 +123,12 @@ export default function HelpSupportPage() {
                 <p className="text-gray-600 mb-4">
                   Answers to frequently asked questions
                 </p>
-                <a href="#faq-section" className="text-green-600 hover:text-green-700 font-medium">
+                <Link
+                  to="/faq"
+                  className="text-green-600 hover:text-green-700 font-medium"
+                >
                   Browse FAQs
-                </a>
+                </Link>
               </div>
 
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">

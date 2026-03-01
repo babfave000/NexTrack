@@ -5,27 +5,51 @@ export default function GuidelinePage() {
   const faqs = [
     {
       question: "How do I add a new product?",
-      answer: "Go to the Inventory page and click the 'Add Product' button. Fill in the required information including product name, cost price, sale price, and stock quantity."
+      answer: "Go to the Inventory page and click the 'Add Product' button. Fill in the required information including product name, cost price, sale price, and stock quantity. You can also add categories, brands, and upload product images."
     },
     {
       question: "How do I create a sales order?",
-      answer: "Navigate to the Sales Orders page and click 'New Sales Order'. Select the customer, add products, and set the quantities. The system will automatically calculate totals."
+      answer: "Navigate to the Sales Orders page and click 'New Sales Order'. Select the customer, add products with quantities, and the system will automatically calculate totals. You can generate invoices and track order status."
+    },
+    {
+      question: "How do I manage purchase orders?",
+      answer: "Go to Purchase Orders page to create new orders, track deliveries, and update inventory. Add suppliers, manage purchase history, and monitor procurement costs."
     },
     {
       question: "Can I export my data?",
-      answer: "Yes, administrators can export data in CSV format from the Admin panel. Go to Admin → Database to export users, products, sales, or purchase data."
+      answer: "Yes, administrators can export data in CSV format from the Admin panel. Go to Admin → Database to export users, products, sales, purchases, and other business data."
     },
     {
       question: "How do I track low stock items?",
-      answer: "The system automatically highlights products with low stock in red on the Inventory page. You can set the low stock threshold in product settings."
+      answer: "The system automatically highlights products with low stock in red on the Inventory page. Set your low stock threshold in Profile Settings or individual product settings."
     },
     {
       question: "Is my data stored locally?",
-      answer: "Yes, all data is stored locally in your browser using IndexedDB. This means your data remains on your device and works offline."
+      answer: "Yes, all data is stored locally in your browser using IndexedDB. This means your data remains on your device and works offline. Optional cloud sync is available."
     },
     {
       question: "How do I reset my password?",
       answer: "Currently, password reset requires contacting your system administrator. They can reset your password from the Admin panel."
+    },
+    {
+      question: "What are user roles and permissions?",
+      answer: "NexTrack has two main roles: Users can manage inventory and sales, while Managers have additional permissions including user management, reports, and system settings."
+    },
+    {
+      question: "How do I backup my data?",
+      answer: "Go to Settings → Backup & Restore to create manual backups or set up automatic backups. You can also export data as JSON files for external backup."
+    },
+    {
+      question: "Can I use NexTrack offline?",
+      answer: "Yes! NexTrack is designed to work completely offline. All features are available without internet connection. Data syncs when you're back online if cloud sync is enabled."
+    },
+    {
+      question: "How do I configure business settings?",
+      answer: "Navigate to Profile → Business Profile to set up your business information, logo, contact details, and preferences like low stock alerts and backup frequency."
+    },
+    {
+      question: "What reports are available?",
+      answer: "Access comprehensive reports from the Reports menu including sales analytics, inventory reports, purchase summaries, profit & loss statements, and custom date-range reports."
     }
   ];
 
@@ -34,30 +58,66 @@ export default function GuidelinePage() {
       title: "Getting Started",
       description: "Learn the basics of NexTrack inventory management",
       steps: [
-        "1. Add your products in the Inventory section",
-        "2. Set up your suppliers in the Purchase Orders section",
-        "3. Create your first sales order",
-        "4. Generate reports to analyze your business"
+        "1. Create your account and set up your business profile",
+        "2. Add your products in the Inventory section with details and images",
+        "3. Set up your suppliers in the Purchase Orders section",
+        "4. Create your first sales order and generate invoice",
+        "5. Configure backup settings and explore reports"
       ]
     },
     {
       title: "Inventory Management",
-      description: "Best practices for managing your inventory",
+      description: "Best practices for managing your inventory efficiently",
       steps: [
-        "1. Regularly update stock levels",
-        "2. Set appropriate low stock alerts",
-        "3. Use categories to organize products",
-        "4. Track product performance in reports"
+        "1. Regularly update stock levels after sales and purchases",
+        "2. Set appropriate low stock alerts for each product",
+        "3. Use categories and brands to organize products better",
+        "4. Track product performance with sales reports",
+        "5. Conduct regular inventory audits and adjustments"
       ]
     },
     {
       title: "Sales Process",
-      description: "How to efficiently process sales orders",
+      description: "Complete guide to processing sales and managing orders",
       steps: [
         "1. Create sales orders for customer purchases",
-        "2. Update inventory automatically",
-        "3. Track order status and history",
-        "4. Generate sales reports for analysis"
+        "2. Update inventory automatically after each sale",
+        "3. Generate professional invoices and receipts",
+        "4. Track order status from pending to completed",
+        "5. Handle returns and change left transactions"
+      ]
+    },
+    {
+      title: "Purchase Management",
+      description: "Managing procurement and supplier relationships",
+      steps: [
+        "1. Add and manage supplier information",
+        "2. Create purchase orders for restocking",
+        "3. Track order deliveries and receipts",
+        "4. Update inventory from purchase deliveries",
+        "5. Monitor purchase costs and supplier performance"
+      ]
+    },
+    {
+      title: "Financial Reporting",
+      description: "Understanding your business financial health",
+      steps: [
+        "1. Generate daily, weekly, and monthly sales reports",
+        "2. Track profit margins on products and overall business",
+        "3. Monitor expenses through purchase reports",
+        "4. Analyze best-selling products and customer trends",
+        "5. Export financial data for accounting purposes"
+      ]
+    },
+    {
+      title: "Data Management",
+      description: "Backup, restore, and secure your business data",
+      steps: [
+        "1. Set up automatic backup schedules",
+        "2. Create manual backups before major changes",
+        "3. Test restore procedures regularly",
+        "4. Export data for external analysis or migration",
+        "5. Manage user access and permissions"
       ]
     }
   ];
@@ -72,7 +132,7 @@ export default function GuidelinePage() {
               <Link to="/dashboard" className="text-xl font-bold text-blue-600">
                 NexTrack
               </Link>
-              <div className="text-sm text-gray-500">Help & Support</div>
+              {/* <div className="text-sm text-gray-500">Help & Support</div>*/}
             </div>
             <Link
               to="/dashboard"
@@ -88,10 +148,11 @@ export default function GuidelinePage() {
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Help & Support
+            NexTrack Help Center
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Find answers to common questions, learn how to use NexTrack, and get the most out of your inventory management system.
+            Your complete guide to mastering NexTrack inventory management. 
+            Find answers, learn best practices, and get the most out of your business management system.
           </p>
         </div>
 
@@ -107,9 +168,12 @@ export default function GuidelinePage() {
                 <p className="text-gray-600 mb-4">
                   Comprehensive guides and tutorials
                 </p>
-                <button className="text-blue-600 hover:text-blue-700 font-medium">
+                <Link
+                  to="/guideline"
+                  className="text-blue-600 hover:text-blue-700 font-medium"
+                >
                   View Guides
-                </button>
+                </Link>
               </div>
 
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">

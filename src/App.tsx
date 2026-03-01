@@ -17,7 +17,7 @@ import WelcomePage from './pages/WelcomePage';
 import AdminPage from './pages/Admin/AdminPage';
 import HelpSupportPage from './pages/Support/HelpSupportPage';
 import ContactUsPage from './pages/Support/ContactUsPage';
-import GuidelinePage from './pages/Support/Guidelinepage';
+import GuidelinePage from './pages/Support/GuidelinePage';
 import CustomToastContainer from './components/Toast/ToastContainer';
 
 // Main navigation links - only essential pages

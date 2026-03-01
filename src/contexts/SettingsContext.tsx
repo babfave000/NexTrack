@@ -69,11 +69,11 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
         const userProfile = await getUserProfile(user.id!);
         
         if (userProfile) {
-          // Use the saved settings from user profile
-          const loadedSettings = {
-            lowStockThreshold: userProfile.lowStockThreshold || defaultSettings.lowStockThreshold,
-            showLowStockWarnings: userProfile.showLowStockWarnings ?? defaultSettings.showLowStockWarnings,
-            autoBackupFrequency: userProfile.autoBackupFrequency || defaultSettings.autoBackupFrequency
+          // Use the saved settings from user profile exactly as stored
+          const loadedSettings: Settings = {
+            lowStockThreshold: userProfile.lowStockThreshold,
+            showLowStockWarnings: userProfile.showLowStockWarnings,
+            autoBackupFrequency: userProfile.autoBackupFrequency
           };
           setSettings(loadedSettings);
           console.log('Settings loaded from user profile:', loadedSettings);

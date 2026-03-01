@@ -18,8 +18,8 @@ export default function UserMenu() {
       if (!user?.id) return;
       
       try {
-        // Convert user.id to string if getUserProfile expects a string
-        const profile = await getUserProfile(user.id.toString());
+        // Convert user.id to string and use the same ID format as UserProfilePage
+        const profile = await getUserProfile(`profile-${user.id}`);
         if (profile) {
           setUserProfile(profile);
         }

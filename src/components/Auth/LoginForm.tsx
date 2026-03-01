@@ -29,10 +29,10 @@ export default function LoginForm() {
     }
 
     try {
-      let success: boolean;
+      let result: { success: boolean; message: string };
       
       if (isLogin) {
-        success = await login(email, password);
+        result = await login(email, password);
       } else {
         const userData = {
           email,
@@ -40,17 +40,17 @@ export default function LoginForm() {
           name,
           role,
         };
-        success = await register(userData);
+        result = await register(userData);
       }
 
-      if (success) {
+      if (result.success) {
         console.log('Authentication successful, redirecting to dashboard...');
         // Use setTimeout to ensure state updates before navigation
         setTimeout(() => {
           navigate('/dashboard');
         }, 100);
       } else {
-        setError(isLogin ? 'Invalid email or password' : 'Registration failed - email may already exist');
+        setError(result.message);
       }
     } catch (error) {
       console.error('Auth error:', error);

@@ -9,8 +9,8 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
+  register: (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => Promise<{ success: boolean; message: string }>;
   logout: () => Promise<void>;
   checkSession: () => Promise<boolean>;
 }
@@ -144,7 +144,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [dbInitialized, sessionChecked, checkSession]);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; message: string }> => {
     try {
       setIsLoading(true);
       // ✅ FIXED: Use the connection helper
@@ -156,13 +156,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (!user) {
         console.log('User not found');
-        return false;
+        return { success: false, message: 'No account found with this email address. Please check your email or create a new account.' };
       }
 
       // In a real app, you'd use proper password hashing
       if (user.password !== password) {
         console.log('Invalid password');
-        return false;
+        return { success: false, message: 'Incorrect password. Please try again or reset your password.' };
       }
 
       // ✅ FIXED: Ensure DB is still open before creating session
@@ -186,7 +186,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setSession({ ...session, id: sessionId } as Session);
       setSessionChecked(true);
       console.log('Login successful for user:', user.email);
-      return true;
+      return { success: true, message: 'Login successful! Redirecting to dashboard...' };
     } catch (error) {
       console.error('Login failed:', error);
       
@@ -200,13 +200,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
       
-      return false;
+      return { success: false, message: 'An unexpected error occurred during login. Please try again.' };
     } finally {
       setIsLoading(false);
     }
   };
 
-  const register = async (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<boolean> => {
+  const register = async (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; message: string }> => {
     try {
       setIsLoading(true);
       // ✅ FIXED: Use the connection helper
@@ -218,7 +218,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (existingUser) {
         console.log('User already exists');
-        return false;
+        return { success: false, message: 'An account with this email already exists. Please use a different email or try logging in.' };
       }
 
       const now = new Date();
@@ -289,7 +289,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
       
-      return false;
+      return { success: false, message: 'Registration failed due to an unexpected error. Please try again.' };
     } finally {
       setIsLoading(false);
     }

@@ -25,18 +25,65 @@ export default function ContactUsPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        category: '',
-        message: ''
+    try {
+      // Send form using Formspree with proper configuration
+      const formDataToSend = {
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject,
+        category: formData.category,
+        message: formData.message
+      };
+
+      // Add honeypot field for spam protection
+      const formDataWithHoneypot = {
+        ...formDataToSend,
+        'form-name': 'contactForm',
+        'form-email': formData.email
+      };
+
+      const response = await fetch('https://formspree.io/f/xjgedgdz', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(formDataWithHoneypot)
       });
-    }, 2000);
+
+      console.log('Formspree response:', response);
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Response data:', responseData);
+        
+        setIsSubmitting(false);
+        setIsSubmitted(true);
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          category: '',
+          message: ''
+        });
+      } else {
+        const errorText = await response.text();
+        console.error('Formspree error response:', errorText);
+        throw new Error(`Formspree error: ${response.status} - ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Contact form error:', error);
+      setIsSubmitting(false);
+      
+      // Detailed error message for debugging
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      console.error('Full error details:', errorMessage);
+      
+      // User-friendly error message
+      alert(`Failed to send message: ${errorMessage}. Please:\n\n1. Check your internet connection\n2. Try again later\n3. Contact us directly at nexaisystemshub@gmail.com`);
+    }
   };
 
   const contactMethods = [
@@ -44,7 +91,7 @@ export default function ContactUsPage() {
       icon: '📧',
       title: 'Email Support',
       description: 'Send us an email and we\'ll respond within 24 hours',
-      contact: 'support@nextrack.com',
+      contact: 'nexaisystemshub@gmail.com',
       action: 'mailto:nexaisystemshub@gmail.com'
     },
     {
