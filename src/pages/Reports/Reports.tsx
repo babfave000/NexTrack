@@ -56,7 +56,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'
 const Reports = () => {
   const { isAuthenticated, user, products: userProducts } = useUserData();
   const [startDate, setStartDate] = useState(() =>
-    format(subDays(new Date(), 30), 'yyyy-MM-dd')
+    format(subDays(new Date(), 29), 'yyyy-MM-dd')
   );
   const [endDate, setEndDate] = useState(() =>
     format(new Date(), 'yyyy-MM-dd')
@@ -85,6 +85,8 @@ const Reports = () => {
       try {
         const start = parseISO(startDate);
         const end = parseISO(endDate);
+        // Set end time to end of day to include all of today's data
+        end.setHours(23, 59, 59, 999);
 
         // Get sales, purchase, and inventory data
         const [salesData, purchaseData, lowStockProducts] = await Promise.all([
@@ -102,6 +104,14 @@ const Reports = () => {
         const purchasesDataFiltered = purchaseData.orders.filter((order) => {
           const orderDate = parseISO(order.date);
           return orderDate >= start && orderDate <= end;
+        });
+
+        console.log('Filtered data:', { 
+          totalSales: salesData.orders.length, 
+          filteredSales: salesDataFiltered.length,
+          totalPurchases: purchaseData.orders.length,
+          filteredPurchases: purchasesDataFiltered.length,
+          dateRange: { startDate, endDate }
         });
 
         // Calculate financial metrics
@@ -139,6 +149,8 @@ const Reports = () => {
 
         // Generate chart data (monthly breakdown)
         const months = eachMonthOfInterval({ start, end });
+        console.log('Date range:', { start, end, monthsCount: months.length });
+        
         const monthlyData = months.map(month => {
           const monthStart = startOfMonth(month);
           const monthEnd = endOfMonth(month);
@@ -293,24 +305,23 @@ const Reports = () => {
   const handleTimeFrameChange = (frame: '7d' | '30d' | '90d' | '1y' | 'custom') => {
     setTimeFrame(frame);
     const today = new Date();
-    const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59); // End of day
     
     switch (frame) {
       case '7d':
-        setStartDate(format(subDays(todayEnd, 6), 'yyyy-MM-dd')); // Start 7 days ago
-        setEndDate(format(todayEnd, 'yyyy-MM-dd'));
+        setStartDate(format(subDays(today, 6), 'yyyy-MM-dd')); // Start 7 days ago (including today)
+        setEndDate(format(today, 'yyyy-MM-dd'));
         break;
       case '30d':
-        setStartDate(format(subDays(todayEnd, 29), 'yyyy-MM-dd')); // Start 30 days ago
-        setEndDate(format(todayEnd, 'yyyy-MM-dd'));
+        setStartDate(format(subDays(today, 29), 'yyyy-MM-dd')); // Start 30 days ago (including today)
+        setEndDate(format(today, 'yyyy-MM-dd'));
         break;
       case '90d':
-        setStartDate(format(subDays(todayEnd, 89), 'yyyy-MM-dd')); // Start 90 days ago
-        setEndDate(format(todayEnd, 'yyyy-MM-dd'));
+        setStartDate(format(subDays(today, 89), 'yyyy-MM-dd')); // Start 90 days ago (including today)
+        setEndDate(format(today, 'yyyy-MM-dd'));
         break;
       case '1y':
-        setStartDate(format(subDays(todayEnd, 364), 'yyyy-MM-dd')); // Start 365 days ago
-        setEndDate(format(todayEnd, 'yyyy-MM-dd'));
+        setStartDate(format(subDays(today, 364), 'yyyy-MM-dd')); // Start 365 days ago (including today)
+        setEndDate(format(today, 'yyyy-MM-dd'));
         break;
       default:
         // Custom remains as is
