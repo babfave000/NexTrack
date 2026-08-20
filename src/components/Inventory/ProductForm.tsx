@@ -4,7 +4,8 @@ import { type Product } from '../../db/dexie';
 
 interface ProductFormProps {
   product?: Product;
-  onSubmit: (product: Omit<Product, 'id'>) => void;
+  onSubmit: (product: Omit<Product, 'id'>) => void | Promise<void>;
+  onSave: () => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
@@ -12,6 +13,7 @@ interface ProductFormProps {
 const ProductForm: React.FC<ProductFormProps> = ({ 
   product, 
   onSubmit, 
+  onSave,
   onCancel, 
   isLoading = false 
 }) => {
@@ -105,11 +107,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (validateForm()) {
-      onSubmit(formData);
+      await onSubmit(formData);
+      onSave();
     }
   };
 

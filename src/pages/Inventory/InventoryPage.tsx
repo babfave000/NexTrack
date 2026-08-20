@@ -5,6 +5,7 @@ import ProductList from '../../components/Inventory/ProductList';
 import { useUserData } from '../../hooks/useUserData';
 import { useSettings } from '../../hooks/useSettings';
 import type { Product } from '../../db/dexie'; // Import the Product type
+import { addProduct, updateProduct } from '../../db/operations/products';
 
 export default function Inventory() {
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
@@ -21,6 +22,14 @@ export default function Inventory() {
     setIsFormExpanded(false);
     setActiveTab('list');
     setFormKey(prev => prev + 1);
+  };
+
+  const handleSubmit = async (product: Omit<Product, 'id'>) => {
+    if (selectedProduct?.id !== undefined) {
+      await updateProduct(selectedProduct.id, product, user!.id!);
+    } else {
+      await addProduct(product, user!.id!);
+    }
   };
 
   const handleEdit = (product: Product) => {
@@ -108,9 +117,9 @@ export default function Inventory() {
             <ProductForm
               key={formKey}
               product={selectedProduct}
+              onSubmit={handleSubmit}
               onSave={handleSave}
               onCancel={handleCancelEdit}
-              userId={user.id!}
             />
           </div>
         </div>

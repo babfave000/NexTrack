@@ -15,6 +15,9 @@ export default function UserProfilePage() {
     website: '',
     socialLinks: '',
     logoUrl: '',
+    lowStockThreshold: 10,
+    showLowStockWarnings: true,
+    autoBackupFrequency: 24,
     userId: user?.id || 0,
   });
 
