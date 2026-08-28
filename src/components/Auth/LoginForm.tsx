@@ -147,7 +147,7 @@ export default function LoginForm() {
               <>
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                    Full Name
+                    Business Name
                   </label>
                   <input
                     id="name"
@@ -156,7 +156,7 @@ export default function LoginForm() {
                     autoComplete="name"
                     required
                     className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10"
-                    placeholder="Enter your full name"
+                    placeholder="Enter your Business name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -174,7 +174,7 @@ export default function LoginForm() {
                     onChange={(e) => setRole(e.target.value as UserRole)}
                   >
                     <option value="user">User</option>
-                    <option value="manager">Manager</option>
+                    {/*<option value="manager">Manager</option> */}
                   </select>
                 </div>
               </>
