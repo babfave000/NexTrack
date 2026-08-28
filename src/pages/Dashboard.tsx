@@ -131,20 +131,16 @@ export default function Dashboard() {
       )}
 
       {/* Header with Time Filter */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+      <div className="dashboard-heading">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
-          <p className="text-gray-600 mt-1">Welcome, {user?.name}! 👋</p>
+          <p className="dashboard-kicker">Business overview</p>
+          <h1 className="dashboard-title">Good to see you, {user?.name?.split(' ')[0] || 'there'}</h1>
+          <p className="dashboard-subtitle">Here is what is moving across your business today.</p>
         </div>
-        
-        <div className="flex items-center grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Link to="/guideline" className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow text-center group">
-          <span className="text-sm font-medium text-gray-700">Guideline</span>
-          </Link>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Time Range:</span>
+        <div className="dashboard-heading-actions">
+          <Link to="/guideline" className="dashboard-guide-link">Open guide <span aria-hidden="true">↗</span></Link>
+          <label className="dashboard-range">
+            <span>Showing</span>
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value as 'today' | 'week' | 'month' | 'all')}
@@ -156,6 +152,7 @@ export default function Dashboard() {
             <option value="month">Last 30 Days</option>
             <option value="all">All Time</option>
           </select>
+          </label>
         </div>
       </div>
 
@@ -164,18 +161,22 @@ export default function Dashboard() {
         <StatCard 
           title="Total Products" 
           value={products?.length || 0} 
+          color="stat-card stat-card-teal"
         />
         <StatCard
           title="Stock Value"
           value={formatCurrency(inventoryStats?.totalRetailValue || 0)}
+          color="stat-card stat-card-slate"
         />
         <StatCard
           title="Total Sales"
           value={formatCurrency(salesStats?.totalRevenue || 0)}
+          color="stat-card stat-card-coral"
         />
         <StatCard
           title="Total Purchases"
           value={formatCurrency(purchaseStats?.totalSpent || 0)}
+          color="stat-card stat-card-gold"
         />
       </div>
 

@@ -12,23 +12,120 @@
 /* --------------------------------------------------- */
 
 html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
-  background-color: #f9fafb; /* Tailwind gray-50 */
+  background-color: #f5f7f4;
 }
 
 body {
   margin: 0;
   padding: 0;
   line-height: 1.5;
-  color: #111827; /* Tailwind gray-900 */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  color: #19231f;
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  background: #f5f7f4;
+}
+
+.app-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid #dce5de;
+  backdrop-filter: blur(14px);
+}
+
+.app-nav-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.app-nav-brand-row {
+  min-height: 4.5rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: #173b2c;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+
+.app-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  color: #fff;
+  background: #d86a3d;
+  border-radius: 0.7rem;
+  box-shadow: 0 5px 12px rgba(216, 106, 61, 0.24);
+}
+
+.app-nav-links {
+  display: flex;
+  align-items: stretch;
+  gap: 0.25rem;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.app-nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 4.5rem;
+  padding: 0 0.8rem;
+  color: #6c7971;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.app-nav-link:hover,
+.app-nav-link.is-active {
+  color: #173b2c;
+}
+
+.app-nav-link.is-active::after {
+  content: '';
+  position: absolute;
+  right: 0.8rem;
+  bottom: 0;
+  left: 0.8rem;
+  height: 3px;
+  background: #d86a3d;
+  border-radius: 3px 3px 0 0;
+}
+
+@media (max-width: 760px) {
+  .app-nav-brand-row {
+    min-height: auto;
+    flex-wrap: wrap;
+    gap: 0.6rem 1rem;
+    padding-top: 0.75rem;
+  }
+
+  .app-nav-links {
+    order: 3;
+    flex-basis: 100%;
+    margin: 0 -1.25rem;
+    padding: 0 1.25rem;
+  }
+
+  .app-nav-link {
+    min-height: 3rem;
+  }
 }
 
 /* --------------------------------------------------- */

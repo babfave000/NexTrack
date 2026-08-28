@@ -41,33 +41,27 @@ function NavBar() {
   }
 
   return (
-    <nav className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-8">
-            <Link to="/dashboard" className="text-xl font-bold text-blue-600">
-              NexTrack
-            </Link>
-            <div className="flex space-x-4">
-              {MAIN_NAV_LINKS.map(({ path, label }) => {
-                const isActive = pathname === path || pathname.startsWith(path + '/');
-                return (
-                  <Link
-                    key={path}
-                    to={path}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition ${
-                      isActive
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
-                  >
-                    {label}
-                  </Link>
-                );
-              })}
-            </div>
+    <nav className="app-nav">
+      <div className="app-nav-inner">
+        <div className="app-nav-brand-row">
+          <Link to="/dashboard" className="app-brand">
+            <span className="app-brand-mark">N</span>
+            <span>NexTrack</span>
+          </Link>
+          <div className="app-nav-links" aria-label="Main navigation">
+            {MAIN_NAV_LINKS.map(({ path, label }) => {
+              const isActive = pathname === path || pathname.startsWith(path + '/');
+              return (
+                <Link
+                  key={path}
+                  to={path}
+                  className={`app-nav-link ${isActive ? 'is-active' : ''}`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
           </div>
-          
           <UserMenu />
         </div>
       </div>

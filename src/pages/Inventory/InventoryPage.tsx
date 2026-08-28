@@ -60,19 +60,20 @@ export default function Inventory() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+    <div className="inventory-page max-w-6xl mx-auto px-4 py-6">
+      <div className="inventory-heading">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Inventory Management</h1>
-          <p className="text-gray-600 mt-1">Manage your products and stock levels</p>
+          <p className="dashboard-kicker">Catalogue control</p>
+          <h1 className="text-2xl font-bold text-gray-800">Inventory workspace</h1>
+          <p className="text-gray-600 mt-1">Keep product details, pricing, and stock levels in sync.</p>
         </div>
         
         {/* Low Stock Alert Form - Now stands alone in the header */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="inventory-threshold">
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0">
               <label htmlFor="lowStockThreshold" className="block text-sm font-medium text-gray-700 mb-1">
-                Low Stock Alert
+                Alert threshold
               </label>
               <input
                 type="number"
@@ -86,25 +87,29 @@ export default function Inventory() {
               />
             </div>
             <div className="flex-shrink-0">
-              <p className="text-xs text-gray-500 max-w-[120px]">
-                Alert when stock falls below this number
+              <p className="text-xs text-gray-500 max-w-[150px]">
+                Flag products when stock drops below this number.
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-        <div className="border-b border-gray-200">
-          <div className="flex">
+      <div className="inventory-workspace bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+        <div className="border-b border-gray-200 px-4 pt-4">
+          <div className="inventory-tabs" role="tablist" aria-label="Inventory workspace views">
             <button
-              className={`px-6 py-3 font-medium text-sm transition-colors ${activeTab === 'form' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              role="tab"
+              aria-selected={activeTab === 'form'}
+              className={`inventory-tab ${activeTab === 'form' ? 'is-active' : ''}`}
               onClick={() => setActiveTab('form')}
             >
               {selectedProduct ? 'Edit Product' : 'Add Product'}
             </button>
             <button
-              className={`px-6 py-3 font-medium text-sm transition-colors ${activeTab === 'list' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              role="tab"
+              aria-selected={activeTab === 'list'}
+              className={`inventory-tab ${activeTab === 'list' ? 'is-active' : ''}`}
               onClick={() => setActiveTab('list')}
             >
               Product List

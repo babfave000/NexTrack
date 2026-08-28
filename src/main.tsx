@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import ErrorBoundary from './ErrorBoundary';
 import './index.css'; // Tailwind CSS
+import './App.css';
 
 const rootElement = document.getElementById('root');
 
