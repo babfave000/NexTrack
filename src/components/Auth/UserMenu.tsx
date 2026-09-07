@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 import { getUserProfile } from '../../db/UserProfile';
 import { type UserProfile } from '../../db/dexie';
+import PWAInstallButton from '../PWA/PWAInstallButton';
 
 export default function UserMenu() {
   const { user, logout } = useAuth();
@@ -253,6 +254,11 @@ export default function UserMenu() {
               </svg>
               <span>Contact Us</span>
             </Link>
+          </div>
+
+          {/* Install PWA Button */}
+          <div className="px-4 py-2 border-t border-gray-100">
+            <PWAInstallButton />
           </div>
 
           {/* Logout Button */}

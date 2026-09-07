@@ -19,6 +19,7 @@ import HelpSupportPage from './pages/Support/HelpSupportPage';
 import ContactUsPage from './pages/Support/ContactUsPage';
 import GuidelinePage from './pages/Support/GuidelinePage';
 import CustomToastContainer from './components/Toast/ToastContainer';
+import PWAUpdateNotification from './components/PWA/PWAUpdateNotification';
 
 // Main navigation links - only essential pages
 const MAIN_NAV_LINKS = [
@@ -45,7 +46,6 @@ function NavBar() {
       <div className="app-nav-inner">
         <div className="app-nav-brand-row">
           <Link to="/dashboard" className="app-brand">
-            <span className="app-brand-mark">N</span>
             <span>NexTrack</span>
           </Link>
           <div className="app-nav-links" aria-label="Main navigation">
@@ -74,40 +74,28 @@ function PublicHeader() {
   const { user } = useAuth();
 
   return (
-    <header className="bg-white shadow-sm">
+    <header className="public-header">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="text-xl font-bold text-blue-600">
+          <Link to="/" className="public-brand">
             NexTrack
           </Link>
-          <div className="flex items-center space-x-4">
+          <div className="public-nav-links">
             {user ? (
               <>
-                <Link
-                  to="/dashboard"
-                  className="text-gray-600 hover:text-gray-900 text-sm font-medium"
-                >
+                <Link to="/dashboard" className="public-nav-link">
                   Dashboard
                 </Link>
-                <Link
-                  to="/profile"
-                  className="text-gray-600 hover:text-gray-900 text-sm font-medium"
-                >
+                <Link to="/profile" className="public-nav-link">
                   Profile
                 </Link>
               </>
             ) : (
               <>
-                <Link
-                  to="/"
-                  className="text-gray-600 hover:text-gray-900 text-sm font-medium"
-                >
+                <Link to="/" className="public-nav-link">
                   Home
                 </Link>
-                <Link
-                  to="/login"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
-                >
+                <Link to="/login" className="public-signin-btn">
                   Sign In
                 </Link>
               </>
@@ -141,6 +129,7 @@ function AppContent() {
       {user && <NavBar />}
       <main className={user ? "max-w-7xl mx-auto py-6 sm:px-6 lg:px-8" : ""}>
         <CustomToastContainer />
+        <PWAUpdateNotification />
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<WelcomePage />} />

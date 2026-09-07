@@ -4,8 +4,12 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import ErrorBoundary from './ErrorBoundary';
+import { registerServiceWorker } from './utils/serviceWorkerManager';
 import './index.css'; // Tailwind CSS
 import './App.css';
+
+// Register service worker for PWA capabilities
+registerServiceWorker();
 
 const rootElement = document.getElementById('root');
 

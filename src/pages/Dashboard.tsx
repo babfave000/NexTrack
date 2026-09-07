@@ -418,6 +418,18 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Footer */}
+      <footer className=" backdrop-blur-md border-t border-white/10 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="border-t border-black/20 mt-8 pt-8 text-center">
+            <p className="text-black/80 text-sm">
+              © 2026 NexTrack. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

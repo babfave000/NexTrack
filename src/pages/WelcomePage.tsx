@@ -1,34 +1,24 @@
 // src/pages/WelcomePage.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowRightIcon, CheckIcon } from '@heroicons/react/24/outline';
 
 const WelcomePage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+    <div className="welcome-page min-h-screen bg-white">
       {/* Navigation Bar */}
-      <nav className="bg-white/5 backdrop-blur-md border-b border-white/10">
+      <nav className="welcome-nav sticky top-0 z-40 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">NT</span>
-                </div>
-                <h1 className="text-xl font-bold text-white">NexTrack</h1>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link
-                to="/login"
-                className="text-white/80 hover:text-white px-4 py-2 text-sm font-medium transition-colors"
-              >
+            <Link to="/" className="welcome-brand text-2xl font-bold text-emerald-700">
+              NexTrack
+            </Link>
+            <div className="flex items-center gap-3">
+              <Link to="/login" className="welcome-nav-link text-gray-600 hover:text-gray-900 px-4 py-2 text-sm font-medium">
                 Sign In
               </Link>
-              <Link
-                to="/login"
-                className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-cyan-600 transition-all shadow-lg"
-              >
-                Get Started Free
+              <Link to="/login" className="welcome-cta-btn bg-emerald-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
+                Get Started
               </Link>
             </div>
           </div>
@@ -36,141 +26,131 @@ const WelcomePage: React.FC = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent"></div>
-          <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl"></div>
-        </div>
+      <section className="welcome-hero relative overflow-hidden bg-gradient-to-br from-white via-emerald-50 to-white pt-20 pb-32">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Badge */}
+          <div className="welcome-badge inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 mb-8 text-sm font-medium">
+            <span className="welcome-badge-dot w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+            Trusted by 500+ African businesses
+          </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
-          <div className="text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-8">
-              <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
-              <span className="text-sm text-white/80 font-medium">Trusted by 500+ businesses worldwide</span>
-            </div>
+          {/* Headline */}
+          <h1 className="welcome-headline text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+            Smart Accounting
+            <span className="welcome-gradient block bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              Made Simple
+            </span>
+          </h1>
 
-            {/* Main Headline */}
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              Smart Accounting
-              <span className="block bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                Made Simple
-              </span>
-            </h1>
+          {/* Subheadline */}
+          <p className="welcome-subheadline text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
+            Manage inventory, track sales, and organize purchases—all in one intuitive app. Works online or offline.
+          </p>
 
-            {/* Subheadline */}
-            <p className="text-xl text-white/70 mb-12 max-w-3xl mx-auto leading-relaxed">
-              NexTrack provides enterprise-grade inventory management, sales tracking, and financial reporting 
-              in an intuitive offline-first platform. Scale your business with confidence.
-            </p>
+          {/* CTA Buttons */}
+          <div className="welcome-cta-group flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+            <Link
+              to="/login"
+              className="welcome-primary-btn bg-emerald-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-emerald-700 transition-all shadow-lg flex items-center gap-2"
+            >
+              Start Free
+              <ArrowRightIcon className="w-5 h-5" />
+            </Link>
+            <button className="welcome-secondary-btn border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors flex items-center gap-2">
+              Watch Demo
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+          </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
-              <Link
-                to="/login"
-                className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-blue-700 hover:to-cyan-600 transition-all shadow-2xl shadow-blue-500/25 hover:shadow-blue-500/40 flex items-center space-x-3"
-              >
-                <span>Start Free Trial</span>
-                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
-              <button className="group border border-white/20 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-white/5 transition-all backdrop-blur-sm flex items-center space-x-3">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Watch Demo</span>
-              </button>
-            </div>
-
-            {/* Trust Indicators */}
-            <div className="flex flex-col items-center space-y-8">
-              <p className="text-white/60 text-sm uppercase tracking-wider font-medium">Trusted by innovative teams at</p>
-              <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
-                {['TechCorp', 'RetailPlus', 'GlobalTrade', 'SupplyChain', 'EcomPro'].map((company) => (
-                  <div key={company} className="text-white/40 font-semibold text-lg">
-                    {company}
-                  </div>
-                ))}
-              </div>
+          {/* Trust Indicators */}
+          <div className="welcome-trust text-gray-500 text-sm">
+            <p className="mb-4">Trusted by businesses in</p>
+            <div className="welcome-trust flex flex-wrap justify-center gap-6">
+              <span className="welcome-trust-item">Nigeria</span>
+              <span className="welcome-trust-item">Kenya</span>
+              <span className="welcome-trust-item">Ghana</span>
+              <span className="welcome-trust-item">South Africa</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="relative bg-white/5 backdrop-blur-md border-t border-b border-white/10 py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="welcome-features py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Everything You Need to Scale
+            <h2 className="welcome-section-title text-4xl font-bold text-gray-900 mb-4">
+              Everything You Need
             </h2>
-            <p className="text-xl text-white/60 max-w-2xl mx-auto">
-              Powerful features designed to streamline your operations and drive growth
+            <p className="welcome-section-subtitle text-xl text-gray-600">
+              Powerful features designed for African small businesses
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="welcome-features-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              {
-                icon: '📊',
-                title: 'Real-time Analytics',
-                description: 'Make data-driven decisions with live dashboards and comprehensive business insights.',
-                features: ['Live Sales Metrics', 'Inventory Turnover', 'Profit Margins', 'Trend Analysis']
-              },
-              {
-                icon: '📦',
-                title: 'Inventory Management',
-                description: 'Track stock levels, automate reordering, and manage suppliers with precision.',
-                features: ['Stock Alerts', 'Supplier Management', 'Barcode Support', 'Batch Tracking']
-              },
-              {
-                icon: '💳',
-                title: 'Sales & POS',
-                description: 'Process transactions, manage customer relationships, and track payment status.',
-                features: ['Multi-payment Support', 'Customer Database', 'Receipt Printing', 'Returns Management']
-              },
-              {
-                icon: '🛒',
-                title: 'Purchase Orders',
-                description: 'Streamline procurement with automated purchase orders and vendor management.',
-                features: ['Auto-generated POs', 'Vendor Portal', 'Payment Tracking', 'Delivery Scheduling']
-              },
-              {
-                icon: '📈',
-                title: 'Financial Reports',
-                description: 'Generate comprehensive financial statements and compliance-ready reports.',
-                features: ['Profit & Loss', 'Balance Sheets', 'Tax Reports', 'Custom Reporting']
-              },
-              {
-                icon: '🌐',
-                title: 'Offline-First Design',
-                description: 'Work seamlessly without internet, with automatic sync when connection returns.',
-                features: ['Local Data Storage', 'Conflict Resolution', 'Background Sync', 'Data Encryption']
-              }
-            ].map((feature, index) => (
-              <div 
-                key={index}
-                className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:scale-105"
-              >
-                <div className="w-14 h-14 bg-gradient-to-br from-blue-500/20 to-cyan-400/20 rounded-xl flex items-center justify-center mb-6 group-hover:from-blue-500/30 group-hover:to-cyan-400/30 transition-colors">
-                  <span className="text-2xl">{feature.icon}</span>
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
-                <p className="text-white/60 mb-4 leading-relaxed">{feature.description}</p>
-                <ul className="space-y-2">
-                  {feature.features.map((item, idx) => (
-                    <li key={idx} className="flex items-center text-sm text-white/50">
-                      <svg className="w-4 h-4 text-cyan-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {item}
-                    </li>
+              { icon: '📦', title: 'Smart Inventory', desc: 'Track products, stock levels, and get alerts' },
+              { icon: '💰', title: 'Sales Management', desc: 'Create invoices and print receipts instantly' },
+              { icon: '📥', title: 'Purchase Orders', desc: 'Organize supplier purchases easily' },
+              { icon: '📊', title: 'Financial Reports', desc: 'Visualize trends and make decisions' },
+              { icon: '🔌', title: 'Offline First', desc: 'Work with or without internet connection' },
+              { icon: '📱', title: 'Install as App', desc: 'Use like a native mobile app' }
+            ].map((feature, idx) => (
+              <div key={idx} className="welcome-feature-card bg-gray-50 rounded-2xl p-8 hover:shadow-lg hover:scale-105 transition-all">
+                <div className="text-4xl mb-4">{feature.icon}</div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                <p className="text-gray-600">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="welcome-benefits py-24 bg-emerald-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl font-bold text-gray-900 mb-12 text-center">Why Choose NexTrack?</h2>
+          <div className="space-y-6">
+            {[
+              'Track all your business data in one place',
+              'Works perfectly offline with automatic sync',
+              'No complex setup—start using it immediately',
+              'Built for African businesses and payment methods',
+              'Your data stays private and secure',
+              'Affordable pricing for small businesses'
+            ].map((benefit, idx) => (
+              <div key={idx} className="flex items-start gap-4">
+                <CheckIcon className="w-6 h-6 text-emerald-600 flex-shrink-0 mt-1" />
+                <p className="text-lg text-gray-700">{benefit}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="welcome-testimonials py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl font-bold text-gray-900 mb-12 text-center">What Our Users Say</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { name: 'Chidi O.', role: 'Shop Owner', text: 'NexTrack transformed how I manage my shop. The offline feature is a lifesaver!' },
+              { name: 'Tunde M.', role: 'Retailer', text: 'Simple, fast, and exactly what I need. No unnecessary features, just what works.' },
+              { name: 'Amara K.', role: 'Business Owner', text: 'I recommend NexTrack to all my friends. Best investment for my business.' }
+            ].map((testimonial, idx) => (
+              <div key={idx} className="welcome-testimonial-card bg-gray-50 rounded-2xl p-8">
+                <div className="flex gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className="text-yellow-400 text-xl">★</span>
                   ))}
-                </ul>
+                </div>
+                <p className="text-gray-700 mb-6 italic">"{testimonial.text}"</p>
+                <div>
+                  <p className="font-semibold text-gray-900">{testimonial.name}</p>
+                  <p className="text-sm text-gray-600">{testimonial.role}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -178,81 +158,88 @@ const WelcomePage: React.FC = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="relative py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { number: '99.9%', label: 'Uptime Reliability' },
-              { number: '500+', label: 'Active Businesses' },
-              { number: '24/7', label: 'Customer Support' },
-              { number: '50+', label: 'Countries Served' }
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-4xl font-bold text-white mb-2">{stat.number}</div>
-                <div className="text-white/60 text-sm font-medium">{stat.label}</div>
-              </div>
-            ))}
+      <section className="py-24 bg-emerald-600 text-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-5xl font-bold mb-2">500+</div>
+              <p className="text-emerald-100">Active Businesses</p>
+            </div>
+            <div>
+              <div className="text-5xl font-bold mb-2">99.9%</div>
+              <p className="text-emerald-100">Uptime</p>
+            </div>
+            <div>
+              <div className="text-5xl font-bold mb-2">24/7</div>
+              <p className="text-emerald-100">Support</p>
+            </div>
+            <div>
+              <div className="text-5xl font-bold mb-2">50+</div>
+              <p className="text-emerald-100">Countries</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative bg-gradient-to-r from-blue-600 to-cyan-500 py-20">
+      {/* Final CTA Section */}
+      <section className="welcome-final-cta py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Ready to Transform Your Business?
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">
+            Ready to Grow Your Business?
           </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of businesses that trust NexTrack for their daily operations. 
-            Start your free trial today - no credit card required.
+          <p className="text-xl text-gray-600 mb-10">
+            Join thousands of businesses using NexTrack today. Free forever plan available.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/login"
-              className="bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-100 transition-colors shadow-2xl flex items-center space-x-3"
+              className="bg-emerald-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-emerald-700 transition-colors shadow-lg"
             >
-              <span>Start Free Trial</span>
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              Start Free Trial
             </Link>
-            <Link
-              to="/login"
-              className="border border-white/30 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-white/10 transition-colors"
-            >
-              Schedule a Demo
-            </Link>
+            <button className="border-2 border-emerald-600 text-emerald-600 px-8 py-4 rounded-xl font-semibold hover:bg-emerald-50 transition-colors">
+              Schedule Demo
+            </button>
           </div>
-          <p className="text-white/70 text-sm mt-6">
-            Free 14-day trial • No setup fees • Cancel anytime
-          </p>
+          <p className="text-gray-500 text-sm mt-6">No credit card required • 14-day free trial • Cancel anytime</p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900/50 backdrop-blur-md border-t border-white/10 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-4 mb-6 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">NT</span>
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">NexTrack</h2>
-                <p className="text-white/60 text-sm">Smart Offline Accounting Solutions</p>
-              </div>
+      <footer className="welcome-footer bg-gray-900 text-gray-300 py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h3 className="text-white font-bold mb-4">NexTrack</h3>
+              <p className="text-sm">Smart accounting for African businesses</p>
             </div>
-            <div className="flex flex-wrap justify-center gap-6 text-sm text-white/60">
-              <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="/security" className="hover:text-white transition-colors">Security</a>
-              <a href="/compliance" className="hover:text-white transition-colors">Compliance</a>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Product</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white">Features</a></li>
+                <li><a href="#" className="hover:text-white">Pricing</a></li>
+                <li><a href="#" className="hover:text-white">Security</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white">About</a></li>
+                <li><a href="#" className="hover:text-white">Blog</a></li>
+                <li><a href="#" className="hover:text-white">Contact</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white">Privacy</a></li>
+                <li><a href="#" className="hover:text-white">Terms</a></li>
+                <li><a href="#" className="hover:text-white">Compliance</a></li>
+              </ul>
             </div>
           </div>
-          <div className="border-t border-white/10 mt-8 pt-8 text-center">
-            <p className="text-white/40 text-sm">
-              © 2025 NEXAI SYSTEMS HUB. All rights reserved.
-            </p>
+          <div className="border-t border-gray-700 pt-8 text-center text-sm">
+            <p>© 2026 NexTrack. All rights reserved.</p>
           </div>
         </div>
       </footer>
