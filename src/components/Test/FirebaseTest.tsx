@@ -150,7 +150,7 @@ export default function FirebaseTest() {
         stock: 10,
         costPrice: 15.99,
         salePrice: 29.99,
-        lowStockThreshold: 5, // Added the required property
+        lowStockThreshold: 0, // Added the required property
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         userId: user?.id || 1 // Use user's ID or fallback to 1
@@ -218,7 +218,9 @@ export default function FirebaseTest() {
           </div>
           
           <div>Auth State:</div>
-          <div>{firebaseSyncService.getAuthState() ? '✅ Authenticated' : '❌ Not authenticated'}</div>
+          <div className={`font-medium ${userId ? 'text-green-600' : 'text-red-600'}`}>
+            {userId ? '✅ Authenticated' : '❌ Not authenticated'}
+          </div>
           
           <div>Sync Status:</div>
           <div className={`font-medium ${

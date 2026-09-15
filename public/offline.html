@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0" />
+    <meta name="theme-color" content="#065f46" />
+    <title>NexTrack – You're offline</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; height: 100%; }
+      body {
+        font-family: 'Trebuchet MS', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        color: #111827;
+        background:
+          radial-gradient(1200px 800px at 10% -10%, #d1fae5 0%, transparent 60%),
+          radial-gradient(1000px 700px at 110% 10%, #a7f3d0 0%, transparent 55%),
+          linear-gradient(180deg, #ecfdf5 0%, #ffffff 55%, #f0fdf4 100%);
+        min-height: 100%;
+        display: grid;
+        place-items: center;
+        padding:
+          max(1.5rem, env(safe-area-inset-top))
+          max(1.5rem, env(safe-area-inset-right))
+          max(1.5rem, env(safe-area-inset-bottom))
+          max(1.5rem, env(safe-area-inset-left));
+      }
+      .card {
+        width: min(520px, 100%);
+        background: #ffffff;
+        border-radius: 1.25rem;
+        padding: clamp(1.5rem, 4vw, 2.5rem);
+        box-shadow: 0 30px 60px -25px rgba(5, 150, 105, 0.25), 0 10px 25px -10px rgba(15, 23, 42, 0.12);
+        border: 1px solid #bbf7d0;
+      }
+      .mark {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 12px 30px -10px rgba(5, 150, 105, 0.55);
+      }
+      .mark svg { width: 36px; height: 36px; }
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: clamp(1.6rem, 4vw, 2rem);
+        color: #065f46;
+        letter-spacing: -0.02em;
+      }
+      p {
+        color: #4b5563;
+        line-height: 1.6;
+        margin: 0 0 0.4rem;
+      }
+      .sub { color: #059669; font-weight: 600; }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1.75rem;
+      }
+      button, a.btn {
+        appearance: none;
+        border: 0;
+        text-decoration: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95rem;
+        padding: 0.85rem 1.25rem;
+        min-height: 46px;
+        border-radius: 0.75rem;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      }
+      .primary {
+          color: #fff;
+          background: linear-gradient(135deg, #059669 0%, #047857 100%);
+          box-shadow: 0 10px 25px -10px rgba(5, 150, 105, 0.7);
+        }
+      .primary:hover { transform: translateY(-1px); box-shadow: 0 15px 30px -10px rgba(5, 150, 105, 0.85); }
+      .secondary {
+          background: #fff;
+          color: #111827;
+          border: 1px solid #d1d5db;
+        }
+      .secondary:hover { background: #f9fafb; }
+      .tips {
+        display: block;
+        margin-top: 1.5rem;
+        padding-top: 1.25rem;
+        border-top: 1px dashed #a7f3d0;
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+      .tips ul { margin: 0.5rem 0 0; padding-left: 1.1rem; }
+      .tips li { margin: 0.3rem 0; }
+    </style>
+  </head>
+  <body>
+    <main class="card" role="alert" aria-live="polite">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 0110.05-7.02M10.71 5.05A16 16 0 0122.58 9M1.42 9a15.91 15.91 0 014.7-2.88M8.53 16.11a6 6 0 016.95 0M12 20l.95-.95M12 20l-3.5-3.5M12 20l3.5-3.5"/>
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" opacity=".4"/>
+        </svg>
+      </div>
+      <h1>You're offline</h1>
+      <p class="sub">NexTrack needs a quick connection check.</p>
+      <p>Your saved dashboard and reports may be available once your device reconnects to the internet. In the meantime, you can retry or head back to the home page if it was cached earlier.</p>
+      <div class="actions">
+        <button class="primary" type="button" onclick="location.reload()">Retry connection</button>
+        <a class="btn secondary" href="/">Go to home</a>
+      </div>
+      <div class="tips">
+        <strong>Troubleshooting</strong>
+        <ul>
+          <li>Check that Wi-Fi or mobile data is turned on</li>
+          <li>If using a VPN or captive portal, open another site to confirm connectivity</li>
+          <li>Restart the NexTrack PWA from your home screen</li>
+        </ul>
+      </div>
+    </main>
+  </body>
+</html>

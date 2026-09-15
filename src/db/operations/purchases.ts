@@ -401,7 +401,7 @@ async function addStock(items: PurchaseOrder['items'], userId: number): Promise<
         stock: item.quantity,
         costPrice: item.price,
         salePrice: item.price * 1.5, // Default markup
-        lowStockThreshold: 10,
+        lowStockThreshold: 0,
         userId,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

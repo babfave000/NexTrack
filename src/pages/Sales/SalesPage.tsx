@@ -144,7 +144,7 @@ export default function SalesPage({ initialTab = 'new' }: SalesPageProps) {
             <p className="text-gray-600 mt-1">Manage customer orders and invoices</p>
           </div>
           
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap gap-2 items-center">
             <button
               onClick={() => {
                 setActiveTab('new');
@@ -209,7 +209,7 @@ export default function SalesPage({ initialTab = 'new' }: SalesPageProps) {
 
           {/* Filters and Search */}
           <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" viewBox="0 0 20 20" fill="currentColor">

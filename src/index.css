@@ -108,23 +108,39 @@ body {
   border-radius: 3px 3px 0 0;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 767px) {
   .app-nav-brand-row {
     min-height: auto;
     flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
     gap: 0.6rem 1rem;
     padding-top: 0.75rem;
+    padding-bottom: 0.5rem;
   }
 
   .app-nav-links {
     order: 3;
     flex-basis: 100%;
-    margin: 0 -1.25rem;
-    padding: 0 1.25rem;
+    margin: 0.25rem -1.25rem 0;
+    padding: 0.25rem 1.25rem;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.5rem;
+    overflow-x: visible;
   }
 
   .app-nav-link {
-    min-height: 3rem;
+    min-height: 44px;
+    padding: 0.25rem 0.65rem;
+    line-height: 44px;
+    border-radius: 0.6rem;
+  }
+
+  .app-nav-link.is-active::after {
+    right: 0.65rem;
+    left: 0.65rem;
   }
 }
 
@@ -556,4 +572,20 @@ textarea:focus {
   .container {
     max-width: 1536px;
   }
+}
+
+/* --------------------------------------------------- */
+/*             PWA Safe-Area Fixed Elements            */
+/* --------------------------------------------------- */
+
+.Toastify__toast-container {
+  padding-top: max(12px, env(safe-area-inset-top));
+  padding-right: max(12px, env(safe-area-inset-right));
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  padding-left: max(12px, env(safe-area-inset-left));
+}
+
+.pwa-update-root {
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
+  padding-right: max(0px, env(safe-area-inset-right));
 }

@@ -4,41 +4,53 @@
     <meta charset="UTF-8" />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/icon.jpg" />
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" sizes="192x192" />
+    <link rel="icon" type="image/jpeg" href="/icon.jpg" />
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon.svg" />
 
     <!-- Title & Basic SEO -->
     <title>NexTrack – Smart Offline Accounting</title>
-    <meta name="description" content="NexTrack helps small businesses manage inventory, sales, and accounting with offline-first capabilities." />
+    <meta name="description" content="NexTrack helps small businesses manage inventory, sales, and accounting with offline-first capabilities and optional Firebase cloud sync." />
     <meta name="author" content="NexAI Systems Hub" />
-    
+
     <!-- Mobile & PWA Support -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0f172a" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#065f46" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="NexTrack" />
+    <meta name="format-detection" content="telephone=no" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- PWA Splash (optional, device-specific icons can be added later) -->
-    <meta name="msapplication-TileColor" content="#0f172a" />
-    <meta name="msapplication-TileImage" content="/icons/icon-192x192.png" />
+    <!-- iOS PWA Splash Screens (uses SVG icon; scales to fill) -->
+    <link rel="apple-touch-startup-image" href="/icons/icon.svg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/icons/icon.svg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/icons/icon.svg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/icons/icon.svg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/icons/icon.svg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/icons/icon.svg" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/icons/icon.svg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/icons/icon.svg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
 
-    <!-- Open Graph (for social sharing, optional) -->
+    <!-- Windows Tile -->
+    <meta name="msapplication-TileColor" content="#065f46" />
+    <meta name="msapplication-TileImage" content="/icons/icon.svg" />
+
+    <!-- Open Graph (for social sharing) -->
     <meta property="og:title" content="NexTrack – Smart Offline Accounting" />
-    <meta property="og:description" content="Track inventory, sales, and finances even offline with NexTrack." />
-    <meta property="og:image" content="/icons/icon-512x512.png" />
+    <meta property="og:description" content="Track inventory, sales, and finances even offline with NexTrack — small business accounting software." />
+    <meta property="og:image" content="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=NexTrack%20business%20accounting%20app%20social%20card%2C%20emerald%20teal%20gradient%20background%2C%20modern%20flat%20illustration%20showing%20bar%20charts%20and%20inventory%20boxes%2C%20text%20%22NexTrack%20-%20Smart%20Offline%20Accounting%22%20at%20top%2C%20brand%20mark%20logo%2C%20product%20hunt%20style&image_size=landscape_16_9" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://nextrack.ink" />
 
-    <!-- Twitter Card (optional) -->
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="NexTrack – Smart Offline Accounting" />
     <meta name="twitter:description" content="Track inventory, sales, and finances even offline with NexTrack." />
-    <meta name="twitter:image" content="/icons/icon-512x512.png" />
+    <meta name="twitter:image" content="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=NexTrack%20business%20accounting%20app%20social%20card%2C%20emerald%20teal%20gradient%20background%2C%20modern%20flat%20illustration%20showing%20bar%20charts%20and%20inventory%20boxes%2C%20text%20%22NexTrack%20-%20Smart%20Offline%20Accounting%22%20at%20top%2C%20brand%20mark%20logo%2C%20product%20hunt%20style&image_size=landscape_16_9" />
   </head>
-  <body class="bg-gray-50 text-gray-800 antialiased">
+  <body class="bg-gray-50 text-gray-800 antialiased pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
     <div id="root"></div>
 
     <!-- Entry Script -->

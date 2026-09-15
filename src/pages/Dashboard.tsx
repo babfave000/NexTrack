@@ -6,6 +6,7 @@ import { useUserData } from '../hooks/useUserData';
 import { getSalesStats, getPurchaseStats, getInventoryValuation, getLowStockProducts } from '../db/operations';
 import { useAuth } from '../hooks/useAuth';
 import { useSettings } from '../hooks/useSettings';
+import { usePWAInstall } from '../hooks/usePWAInstall';
 
 // Import types from your database or define matching interfaces
 import type { SalesOrder as DbSalesOrder, PurchaseOrder as DbPurchaseOrder } from '../db/dexie';
@@ -37,6 +38,14 @@ export default function Dashboard() {
   const { products } = useUserData();
   const { user, isLoading: authLoading } = useAuth();
   const { settings } = useSettings();
+  const { canInstall, installApp } = usePWAInstall();
+  const [installBannerDismissed, setInstallBannerDismissed] = useState<boolean>(() => {
+    try {
+      return typeof window !== 'undefined' && localStorage.getItem('nextrack-install-dismissed') === '1';
+    } catch {
+      return false;
+    }
+  });
   const [timeRange, setTimeRange] = useState<'today' | 'week' | 'month' | 'all'>('today');
   const [isLoading, setIsLoading] = useState(true);
   const [salesStats, setSalesStats] = useState<SalesStats | null>(null);
@@ -137,7 +146,7 @@ export default function Dashboard() {
           <h1 className="dashboard-title">Good to see you, {user?.name?.split(' ')[0] || 'there'}</h1>
           <p className="dashboard-subtitle">Here is what is moving across your business today.</p>
         </div>
-        <div className="dashboard-heading-actions">
+        <div className="dashboard-heading-actions flex-wrap">
           <Link to="/guideline" className="dashboard-guide-link">Open guide <span aria-hidden="true">↗</span></Link>
           <label className="dashboard-range">
             <span>Showing</span>
@@ -155,6 +164,58 @@ export default function Dashboard() {
           </label>
         </div>
       </div>
+
+      {canInstall && !installBannerDismissed && (
+        <div className="mb-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-lg shadow-blue-600/20 p-5 sm:p-6 relative overflow-hidden">
+          <div className="absolute -top-8 -right-8 w-40 h-40 bg-white/5 rounded-full"></div>
+          <div className="absolute -bottom-12 -left-6 w-48 h-48 bg-white/5 rounded-full"></div>
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex items-start gap-4 flex-1 min-w-0">
+              <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center text-white text-2xl">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5v6m0 0l-3-3m3 3l3-3M9 3h6a3 3 0 013 3v3M9 3H6a3 3 0 00-3 3v12a3 3 0 003 3h12a3 3 0 003-3V9a3 3 0 00-3-3h-3M9 3a3 3 0 003 3h0a3 3 0 003-3" />
+                </svg>
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-white font-bold text-base sm:text-lg leading-tight">
+                  Install NexTrack
+                </h3>
+                <p className="text-blue-100 text-sm mt-1 leading-relaxed">
+                  Add to your home screen for one-tap access, offline support, and a fullscreen native experience.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3 sm:flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    localStorage.setItem('nextrack-install-dismissed', '1');
+                  } catch { /* noop */ }
+                  setInstallBannerDismissed(true);
+                }}
+                className="min-h-[44px] px-4 rounded-xl text-white/90 hover:text-white bg-white/10 hover:bg-white/20 border border-white/10 transition-colors text-sm font-medium"
+                aria-label="Dismiss install banner"
+              >
+                Later
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    localStorage.setItem('nextrack-install-dismissed', '1');
+                  } catch { /* noop */ }
+                  setInstallBannerDismissed(true);
+                  void installApp();
+                }}
+                className="min-h-[44px] px-4 sm:px-5 rounded-xl bg-white text-blue-700 hover:bg-blue-50 shadow-md shadow-black/10 transition-colors text-sm font-semibold whitespace-nowrap"
+              >
+                Install app
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid - Fixed StatCard props */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
@@ -213,7 +274,7 @@ export default function Dashboard() {
 
       {/* Data Loading State */}
       {isLoading ? (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="animate-pulse">
               <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
@@ -260,7 +321,7 @@ export default function Dashboard() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Sales Card */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-6">

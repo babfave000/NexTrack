@@ -1,16 +1,13 @@
-/**
- * PWA Update Notification Component
- * Displays a notification when a new version of the app is available
- */
-
 import { useState, useEffect } from 'react';
 
 export default function PWAUpdateNotification() {
   const [showUpdate, setShowUpdate] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const handleSWUpdate = () => {
       setShowUpdate(true);
+      requestAnimationFrame(() => setMounted(true));
     };
 
     window.addEventListener('sw-update-available', handleSWUpdate);
@@ -23,14 +20,24 @@ export default function PWAUpdateNotification() {
   if (!showUpdate) return null;
 
   const handleUpdate = () => {
-    // Send message to service worker to skip waiting
+    window.dispatchEvent(new CustomEvent('sw-user-skipped-waiting'));
     if (navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
     }
   };
 
+  const handleLater = () => {
+    setMounted(false);
+    setTimeout(() => setShowUpdate(false), 320);
+  };
+
   return (
-    <div className="fixed bottom-6 right-6 z-50 max-w-sm animate-in fade-in-80 slide-in-from-bottom-4">
+    <div
+      className={
+        'pwa-update-root fixed bottom-6 right-6 z-50 max-w-sm transition-all duration-300 ease-out transform ' +
+        (mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4')
+      }
+    >
       <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0 pt-0.5">
@@ -46,13 +53,13 @@ export default function PWAUpdateNotification() {
             <div className="mt-3 flex gap-2">
               <button
                 onClick={handleUpdate}
-                className="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors min-h-[44px]"
               >
                 Update now
               </button>
               <button
-                onClick={() => setShowUpdate(false)}
-                className="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                onClick={handleLater}
+                className="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors min-h-[44px]"
               >
                 Later
               </button>

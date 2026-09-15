@@ -15,7 +15,7 @@ export default function UserProfilePage() {
     website: '',
     socialLinks: '',
     logoUrl: '',
-    lowStockThreshold: 10,
+    lowStockThreshold: 0,
     showLowStockWarnings: true,
     autoBackupFrequency: 24,
     userId: user?.id || 0,
@@ -98,14 +98,33 @@ export default function UserProfilePage() {
     }
 
     try {
+      const profileId = `profile-${user.id}`;
+      // Always re-read the latest profile from DB before writing so we don't
+      // clobber preference fields (lowStockThreshold / warnings / backup
+      // frequency) that this page's useState default would otherwise reset.
+      const latest = await getUserProfile(profileId);
       const profileToSave = {
-        ...profile,
+        id: profileId,
         userId: user.id,
-        id: `profile-${user.id}`, // Use consistent ID format
-        updatedAt: new Date().toISOString()
+        businessName: profile.businessName,
+        email: profile.email,
+        phone: profile.phone,
+        website: profile.website,
+        socialLinks: profile.socialLinks,
+        logoUrl: profile.logoUrl,
+        address: profile.address,
+        // Preserve existing user preference fields from the stored record;
+        // fall back to the state values if the record didn't have them.
+        lowStockThreshold: latest?.lowStockThreshold ?? profile.lowStockThreshold,
+        showLowStockWarnings: latest?.showLowStockWarnings ?? profile.showLowStockWarnings,
+        autoBackupFrequency: latest?.autoBackupFrequency ?? profile.autoBackupFrequency,
+        // Preserve / initialize timestamps
+        createdAt: latest?.createdAt ?? new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        organizationId: latest?.organizationId ?? profile.organizationId,
       };
       
-      await updateUserProfile(profileToSave, `profile-${user.id}`);
+      await updateUserProfile(profileToSave, profileId);
       setSavedMessage('Profile updated successfully');
       setTimeout(() => setSavedMessage(''), 3000);
     } catch (error) {

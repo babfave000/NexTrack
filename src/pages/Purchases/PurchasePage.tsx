@@ -276,10 +276,10 @@ export default function PurchasePage({ initialTab = 'new' }: PurchasePageProps) 
           <p className="text-gray-600 mt-1">Manage supplier orders and inventory restocking</p>
         </div>
         
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2 items-center">
           <button
             onClick={() => setActiveTab('new')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`min-h-[44px] px-4 py-2 rounded-lg font-medium transition-colors ${
               activeTab === 'new' 
                 ? 'bg-blue-600 text-white' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -289,7 +289,7 @@ export default function PurchasePage({ initialTab = 'new' }: PurchasePageProps) 
           </button>
           <button
             onClick={() => setActiveTab('history')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`min-h-[44px] px-4 py-2 rounded-lg font-medium transition-colors ${
               activeTab === 'history' 
                 ? 'bg-blue-600 text-white' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'

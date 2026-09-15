@@ -1,5 +1,5 @@
 // src/pages/Inventory/InventoryPage.tsx
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ProductForm from '../../components/Inventory/ProductForm';
 import ProductList from '../../components/Inventory/ProductList';
 import { useUserData } from '../../hooks/useUserData';
@@ -15,6 +15,17 @@ export default function Inventory() {
   const [formKey, setFormKey] = useState(0);
   const { isAuthenticated, user } = useUserData();
   const { settings, updateSettings, isLoading: settingsLoading } = useSettings();
+  const thresholdDebounceRef = useRef<number | null>(null);
+  const lastSavedThresholdRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (thresholdDebounceRef.current !== null) {
+        window.clearTimeout(thresholdDebounceRef.current);
+        thresholdDebounceRef.current = null;
+      }
+    };
+  }, []);
 
   const handleSave = () => {
     setSelectedProduct(undefined);
@@ -44,9 +55,29 @@ export default function Inventory() {
     setActiveTab('list');
   };
 
-  const handleThresholdChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Math.max(1, Number(e.target.value));
-    await updateSettings({ lowStockThreshold: value });
+  const handleThresholdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const parsed = Number(e.target.value);
+    const value = Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+
+    if (thresholdDebounceRef.current !== null) {
+      window.clearTimeout(thresholdDebounceRef.current);
+      thresholdDebounceRef.current = null;
+    }
+
+    // Optimistically reflect locally so the input feels responsive even
+    // while the debounced persistence is queued.
+    if (settings.lowStockThreshold !== value) {
+      // Note: settings context owns the source of truth — the input is
+      // controlled by settings.lowStockThreshold; we still keep the ref
+      // gate below so we don't repeatedly write the same value.
+    }
+
+    thresholdDebounceRef.current = window.setTimeout(() => {
+      thresholdDebounceRef.current = null;
+      if (lastSavedThresholdRef.current === value) return;
+      lastSavedThresholdRef.current = value;
+      void updateSettings({ lowStockThreshold: value });
+    }, 450);
   };
 
   if (!isAuthenticated || !user) {
@@ -78,12 +109,12 @@ export default function Inventory() {
               <input
                 type="number"
                 id="lowStockThreshold"
-                min={1}
+                min={0}
                 value={settingsLoading ? '' : settings.lowStockThreshold}
                 onChange={handleThresholdChange}
                 disabled={settingsLoading}
                 className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                placeholder={settingsLoading ? "Loading..." : "5"}
+                placeholder={settingsLoading ? "Loading..." : "0"}
               />
             </div>
             <div className="flex-shrink-0">

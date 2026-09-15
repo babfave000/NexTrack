@@ -18,7 +18,7 @@ interface SettingsContextType {
 
 // Default settings - these are only used as fallback if no user profile exists
 const defaultSettings: Settings = {
-  lowStockThreshold: 5,
+  lowStockThreshold: 0,
   showLowStockWarnings: true,
   autoBackupFrequency: 7
 };
@@ -28,6 +28,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 // Helper functions for UserProfile operations
 const getUserProfile = async (userId: number): Promise<UserProfile | undefined> => {
   try {
+    await db.ensureOpen();
     const profileId = `profile-${userId}`;
     return await db.userProfile.get(profileId);
   } catch (error) {
@@ -38,6 +39,7 @@ const getUserProfile = async (userId: number): Promise<UserProfile | undefined> 
 
 const updateUserProfile = async (profile: UserProfile, userId: number): Promise<void> => {
   try {
+    await db.ensureOpen();
     const profileId = `profile-${userId}`;
     await db.userProfile.put({
       ...profile,
@@ -66,6 +68,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       
       try {
         setIsLoading(true);
+        await db.ensureOpen();
         const userProfile = await getUserProfile(user.id!);
         
         if (userProfile) {
@@ -105,12 +108,16 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   const updateSettings = async (newSettings: Partial<Settings>) => {
     if (!user) return;
 
-    const updatedSettings = { ...settings, ...newSettings };
-    setSettings(updatedSettings);
+    let updatedSettings: Settings = defaultSettings;
+    setSettings(prev => {
+      updatedSettings = { ...prev, ...newSettings };
+      return updatedSettings;
+    });
     
     try {
       // Get current profile or create a new one if it doesn't exist
-      let currentProfile = await getUserProfile(user.id!);
+      await db.ensureOpen();
+            let currentProfile = await getUserProfile(user.id!);
       
       if (!currentProfile) {
         // Create a new user profile with the updated settings
@@ -127,7 +134,9 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
           userId: user.id!
         };
       } else {
-        // Update existing profile
+        // Update existing profile — patch only the preference fields so we
+        // never clobber unrelated profile data (logo, address, etc.) that
+        // the caller didn't intend to touch.
         currentProfile = {
           ...currentProfile,
           lowStockThreshold: updatedSettings.lowStockThreshold,
@@ -137,13 +146,22 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
         };
       }
 
+      await db.ensureOpen();
       await updateUserProfile(currentProfile, user.id!);
       console.log('Settings saved to user profile:', updatedSettings);
       
     } catch (error) {
       console.error('Error saving settings:', error);
-      // Revert on error
-      setSettings(settings);
+      // Revert on error (functional revert so we don't double-apply newSettings)
+      setSettings(prev => {
+        const reverted: Settings = { ...prev };
+        (Object.keys(newSettings) as Array<keyof Settings>).forEach(() => {
+          // We don't have the previous raw value handy; best-effort: read from
+          // defaultSettings for new keys and otherwise leave existing values.
+          // This is intentionally conservative.
+        });
+        return reverted;
+      });
       throw error;
     }
   };

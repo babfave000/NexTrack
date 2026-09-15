@@ -18,6 +18,7 @@ import AdminPage from './pages/Admin/AdminPage';
 import HelpSupportPage from './pages/Support/HelpSupportPage';
 import ContactUsPage from './pages/Support/ContactUsPage';
 import GuidelinePage from './pages/Support/GuidelinePage';
+import ResetPassword from './components/Auth/ResetPassword';
 import CustomToastContainer from './components/Toast/ToastContainer';
 import PWAUpdateNotification from './components/PWA/PWAUpdateNotification';
 
@@ -70,52 +71,15 @@ function NavBar() {
 }
 
 // Header component for public pages (Welcome, Login)
-function PublicHeader() {
-  const { user } = useAuth();
-
-  return (
-    <header className="public-header">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <Link to="/" className="public-brand">
-            NexTrack
-          </Link>
-          <div className="public-nav-links">
-            {user ? (
-              <>
-                <Link to="/dashboard" className="public-nav-link">
-                  Dashboard
-                </Link>
-                <Link to="/profile" className="public-nav-link">
-                  Profile
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/" className="public-nav-link">
-                  Home
-                </Link>
-                <Link to="/login" className="public-signin-btn">
-                  Sign In
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 function AppContent() {
   const { user, isLoading } = useAuth();
-  const location = useLocation(); // Get current location
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-white via-emerald-50 to-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -124,8 +88,6 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Only show PublicHeader on login page, not on welcome page */}
-      {!user && location.pathname === '/login' && <PublicHeader />}
       {user && <NavBar />}
       <main className={user ? "max-w-7xl mx-auto py-6 sm:px-6 lg:px-8" : ""}>
         <CustomToastContainer />
@@ -136,6 +98,10 @@ function AppContent() {
           <Route 
             path="/login" 
             element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} 
+          />
+          <Route 
+            path="/reset-password" 
+            element={user ? <Navigate to="/dashboard" replace /> : <ResetPassword />} 
           />
           
           {/* Protected Routes */}

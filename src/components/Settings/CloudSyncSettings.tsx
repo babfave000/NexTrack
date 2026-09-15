@@ -1,10 +1,12 @@
 // src/components/Settings/CloudSyncSettings.tsx
 import { useState, useEffect } from 'react';
 import { useUserData } from '../../hooks/useUserData';
+import { useAuth } from '../../hooks/useAuth';
 import { firebaseSyncService } from '../../services/cloudSync/firebaseSyncService';
 
 export default function CloudSyncSettings() {
   const { user } = useUserData();
+  const { authMode } = useAuth();
   const [isEnabled, setIsEnabled] = useState(false);
   const [autoSync, setAutoSync] = useState(false);
   const [syncInterval, setSyncInterval] = useState(5);
@@ -13,18 +15,20 @@ export default function CloudSyncSettings() {
   const [isFirebaseReady, setIsFirebaseReady] = useState(firebaseSyncService.isReady());
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
 
-  // Convert user ID to string for Firebase service
-  const userId = user?.id ? String(user.id) : null;
+  // Pass the FULL Dexie User object to sync entry points so the service can
+  // extract firebaseUid when present. Falls back to local-id/local email or Dexie
+  // numeric id when not (for localStorage config keys).
+  const scopedUserId = (user ?? undefined) as unknown as string;
 
   useEffect(() => {
     const loadSettings = async () => {
-      if (!userId) return;
-      
-      const config = await firebaseSyncService.loadConfig(userId);
+      if (!user) return;
+
+      const config = await firebaseSyncService.loadConfig(scopedUserId);
       setIsEnabled(config.enabled);
       setAutoSync(config.autoSync);
       setSyncInterval(config.syncInterval);
-      
+
       // Load last sync time from service
       const serviceStatus = firebaseSyncService.getStatus();
       setLastSyncTime(serviceStatus.lastSuccess);
@@ -37,7 +41,7 @@ export default function CloudSyncSettings() {
       const currentStatus = firebaseSyncService.getStatus();
       setStatus(currentStatus);
       setIsFirebaseReady(firebaseSyncService.isReady());
-      
+
       // Update last sync time if it changed
       if (currentStatus.lastSuccess?.getTime() !== lastSyncTime?.getTime()) {
         setLastSyncTime(currentStatus.lastSuccess);
@@ -45,7 +49,7 @@ export default function CloudSyncSettings() {
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [userId, lastSyncTime]);
+  }, [user, scopedUserId, lastSyncTime]);
 
   // Helper function to safely extract error messages
   const getErrorMessage = (error: unknown): string => {
@@ -55,33 +59,44 @@ export default function CloudSyncSettings() {
     return String(error);
   };
 
+  const isFirebaseBacked = authMode === 'firebase';
+
   const handleToggleSync = async () => {
-    if (!userId) {
+    if (!user) {
       alert('❌ No user logged in');
       return;
     }
-    
-    console.log('🔍 Toggle sync - User ID:', { 
-      userId: userId, 
-      type: typeof userId,
-      stringVersion: userId
+    if (!isFirebaseBacked) {
+      alert(
+        '⚠️ Firebase Sync requires a Firebase-created account (not a local Dexie fallback account). ' +
+          'Please sign up using the email/password sign-up form to create a cloud identity, or ' +
+          'link your existing local account by re-registering with the same email via Firebase.',
+      );
+      return;
+    }
+
+    console.log('🔍 Toggle sync - User ID:', {
+      user,
+      type: typeof user,
     });
-    
+
     setIsLoading(true);
     try {
       if (isEnabled) {
-        await firebaseSyncService.disableSync(userId);
+        await firebaseSyncService.disableSync(scopedUserId);
         setIsEnabled(false);
       } else {
         // Test connection first before enabling
         setStatus({ ...status, isSyncing: true, lastError: null });
         const connectionTest = await firebaseSyncService.testConnection();
-        
+
         if (!connectionTest) {
-          throw new Error('Firebase connection test failed. Please check your configuration.');
+          throw new Error(
+            status.lastError || 'Firebase connection test failed. Please check your configuration.',
+          );
         }
-        
-        await firebaseSyncService.enableSync(userId);
+
+        await firebaseSyncService.enableSync(scopedUserId);
         setIsEnabled(true);
       }
       const newStatus = firebaseSyncService.getStatus();
@@ -98,22 +113,28 @@ export default function CloudSyncSettings() {
   };
 
   const handleManualSync = async () => {
-    if (!userId) {
+    if (!user) {
       alert('❌ No user logged in');
       return;
     }
-    
-    console.log('🔍 Manual sync - User ID:', { 
-      userId: userId, 
-      type: typeof userId,
-      stringVersion: userId
+    if (!isFirebaseBacked) {
+      alert(
+        '⚠️ Manual Sync requires a Firebase account. ' +
+          'Please register or sign in with Firebase to use cloud sync.',
+      );
+      return;
+    }
+
+    console.log('🔍 Manual sync - User ID:', {
+      user,
+      type: typeof user,
     });
-    
+
     setIsLoading(true);
     setStatus({ ...status, isSyncing: true, lastError: null });
-    
+
     try {
-      await firebaseSyncService.sync(userId);
+      await firebaseSyncService.sync(scopedUserId);
       const newStatus = firebaseSyncService.getStatus();
       setStatus(newStatus);
       setLastSyncTime(newStatus.lastSuccess);
@@ -128,13 +149,13 @@ export default function CloudSyncSettings() {
   };
 
   const handleAutoSyncToggle = async () => {
-    if (!userId) return;
-    
+    if (!user) return;
+
     const newAutoSync = !autoSync;
     setAutoSync(newAutoSync);
-    
+
     try {
-      await firebaseSyncService.updateConfig(userId, { autoSync: newAutoSync });
+      await firebaseSyncService.updateConfig(scopedUserId, { autoSync: newAutoSync });
       const newStatus = firebaseSyncService.getStatus();
       setStatus(newStatus);
       setLastSyncTime(newStatus.lastSuccess);
@@ -146,27 +167,27 @@ export default function CloudSyncSettings() {
   };
 
   const handleIntervalChange = async (value: number) => {
-    if (!userId) return;
-    
+    if (!user) return;
+
     setSyncInterval(value);
-    
+
     try {
-      await firebaseSyncService.updateConfig(userId, { syncInterval: value });
+      await firebaseSyncService.updateConfig(scopedUserId, { syncInterval: value });
     } catch (error: unknown) {
       console.error('Failed to update sync interval:', error);
     }
   };
 
   const handleResetSync = async () => {
-    if (!userId) {
+    if (!user) {
       alert('❌ No user logged in');
       return;
     }
-    
+
     setIsLoading(true);
     try {
-      await firebaseSyncService.resetSyncState(userId);
-      const config = await firebaseSyncService.loadConfig(userId);
+      await firebaseSyncService.resetSyncState(scopedUserId);
+      const config = await firebaseSyncService.loadConfig(scopedUserId);
       setIsEnabled(config.enabled);
       setAutoSync(config.autoSync);
       const newStatus = firebaseSyncService.getStatus();
@@ -183,14 +204,21 @@ export default function CloudSyncSettings() {
   };
 
   const handleTestConnection = async () => {
-    if (!userId) {
+    if (!user) {
       alert('❌ No user logged in');
       return;
     }
-    
+    if (!isFirebaseBacked) {
+      alert(
+        '⚠️ Connection test skipped: Your current session is using local/offline authentication. ' +
+          'Please sign in with a Firebase email/password account to test cloud sync connectivity.',
+      );
+      return;
+    }
+
     setIsLoading(true);
     setStatus({ ...status, isSyncing: true, lastError: null });
-    
+
     try {
       const connectionTest = await firebaseSyncService.testConnection();
       if (connectionTest) {
@@ -199,12 +227,12 @@ export default function CloudSyncSettings() {
         setStatus(newStatus);
         setLastSyncTime(newStatus.lastSuccess);
       } else {
-        throw new Error('Connection test returned false');
+        throw new Error(status.lastError || 'Connection test returned false');
       }
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error);
       setStatus({ ...status, isSyncing: false, lastError: errorMessage });
-      alert(`❌ Connection test failed: ${errorMessage}`);
+      alert(`❌ Connection test failed:\n${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -246,8 +274,45 @@ export default function CloudSyncSettings() {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-      <h2 className="text-lg font-semibold mb-4">☁️ Cloud Sync (Firebase)</h2>
-      
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <h2 className="text-lg font-semibold">☁️ Cloud Sync (Firebase)</h2>
+        <span
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
+            isFirebaseBacked
+              ? 'bg-emerald-100 text-emerald-800 ring-1 ring-inset ring-emerald-200'
+              : 'bg-amber-100 text-amber-800 ring-1 ring-inset ring-amber-200'
+          }`}
+        >
+          {isFirebaseBacked ? (
+            <>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+              Auth: Firebase
+            </>
+          ) : (
+            <>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
+              Auth: Local / Dexie
+            </>
+          )}
+        </span>
+      </div>
+
+      {!isFirebaseBacked && (
+        <div className="mb-5 p-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-800">
+          <p className="font-semibold mb-1">
+            ⚠️ Cloud sync requires a Firebase-authenticated account
+          </p>
+          <p className="text-sm leading-relaxed">
+            Your current session is stored <strong>only locally on this device</strong>
+            (Dexie fallback mode). To enable cross-device sync,{' '}
+            <strong>log out</strong> and either{' '}
+            <strong>sign up for a new account</strong> via the Firebase sign-up form,
+            or re-register your existing email address to create the matching cloud
+            identity. Local Dexie data is preserved.
+          </p>
+        </div>
+      )}
+
       <div className="space-y-4">
         {/* Firebase Status */}
         <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -257,6 +322,16 @@ export default function CloudSyncSettings() {
               <span>Firebase Ready:</span>
               <span className={`font-medium ${isFirebaseReady ? 'text-green-600' : 'text-red-600'}`}>
                 {isFirebaseReady ? '✅ Yes' : '❌ No'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>Auth Mode:</span>
+              <span
+                className={`font-medium ${
+                  isFirebaseBacked ? 'text-emerald-700' : 'text-amber-700'
+                }`}
+              >
+                {isFirebaseBacked ? 'Firebase Cloud' : 'Local Dexie'}
               </span>
             </div>
             <div className="flex justify-between">
@@ -296,17 +371,27 @@ export default function CloudSyncSettings() {
               type="checkbox"
               checked={isEnabled}
               onChange={handleToggleSync}
-              disabled={isLoading}
+              disabled={isLoading || !isFirebaseBacked}
               className="sr-only"
               aria-label={isEnabled ? 'Disable Cloud Sync' : 'Enable Cloud Sync'}
             />
-            <div 
+            <div
               className={`relative w-11 h-6 rounded-full transition-colors ${
                 isEnabled ? 'bg-blue-600' : 'bg-gray-200'
-              } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-              title={isEnabled ? 'Disable Cloud Sync' : 'Enable Cloud Sync'}
+              } ${
+                isLoading || !isFirebaseBacked
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'cursor-pointer'
+              }`}
+              title={
+                !isFirebaseBacked
+                  ? 'Sign in with a Firebase account to enable sync'
+                  : isEnabled
+                    ? 'Disable Cloud Sync'
+                    : 'Enable Cloud Sync'
+              }
             >
-              <div 
+              <div
                 className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${
                   isEnabled ? 'transform translate-x-5' : ''
                 }`}
@@ -316,7 +401,7 @@ export default function CloudSyncSettings() {
         </div>
 
         {/* Auto Sync */}
-        {isEnabled && (
+        {isEnabled && isFirebaseBacked && (
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-medium text-gray-700">Auto Sync</h3>
@@ -331,13 +416,13 @@ export default function CloudSyncSettings() {
                 className="sr-only"
                 aria-label={autoSync ? 'Disable Auto Sync' : 'Enable Auto Sync'}
               />
-              <div 
+              <div
                 className={`relative w-11 h-6 rounded-full transition-colors ${
                   autoSync ? 'bg-blue-600' : 'bg-gray-200'
                 } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 title={autoSync ? 'Disable Auto Sync' : 'Enable Auto Sync'}
               >
-                <div 
+                <div
                   className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${
                     autoSync ? 'transform translate-x-5' : ''
                   }`}
@@ -348,10 +433,10 @@ export default function CloudSyncSettings() {
         )}
 
         {/* Sync Interval */}
-        {isEnabled && autoSync && (
+        {isEnabled && autoSync && isFirebaseBacked && (
           <div className="space-y-2">
-            <label 
-              htmlFor="sync-interval-input" 
+            <label
+              htmlFor="sync-interval-input"
               className="block text-sm font-medium text-gray-700"
             >
               Sync Interval (minutes)
@@ -381,7 +466,7 @@ export default function CloudSyncSettings() {
 
         {/* Action Buttons */}
         <div className="flex flex-col space-y-3">
-          {isEnabled && (
+          {isEnabled && isFirebaseBacked && (
             <button
               type="button"
               onClick={handleManualSync}
@@ -392,7 +477,7 @@ export default function CloudSyncSettings() {
               {status.isSyncing ? '🔄 Syncing...' : 'Sync Now'}
             </button>
           )}
-          
+
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
@@ -403,7 +488,7 @@ export default function CloudSyncSettings() {
             >
               Test Connection
             </button>
-            
+
             <button
               type="button"
               onClick={handleResetSync}
@@ -417,7 +502,7 @@ export default function CloudSyncSettings() {
         </div>
 
         {/* Information Sections */}
-        {!isEnabled && (
+        {!isEnabled && isFirebaseBacked && (
           <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
             <p className="text-sm text-blue-700">
               <strong>Firebase Integration:</strong> Enable cloud sync to backup your data securely and access it across multiple devices. Your data will be stored in Firebase Firestore.
@@ -425,7 +510,7 @@ export default function CloudSyncSettings() {
           </div>
         )}
 
-        {!isFirebaseReady && (
+        {!isFirebaseReady && isFirebaseBacked && (
           <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
             <h4 className="font-medium text-yellow-800 mb-2">Firebase Not Ready</h4>
             <p className="text-sm text-yellow-700">

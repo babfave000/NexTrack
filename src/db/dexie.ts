@@ -14,6 +14,7 @@ export interface User {
   password: string;
   name: string;
   role: UserRole;
+  firebaseUid?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -312,7 +313,7 @@ class NexTrackDB extends Dexie {
         // Add new fields with default values
         product.description = product.description || '';
         product.sku = product.sku || '';
-        product.lowStockThreshold = product.lowStockThreshold || 5;
+        product.lowStockThreshold = product.lowStockThreshold ?? 0;
         // Remove category field (it will be ignored in the new schema)
         delete product.category;
       });
@@ -359,9 +360,9 @@ class NexTrackDB extends Dexie {
       return trans.table('userProfile').toCollection().modify(profile => {
         profile.showLowStockWarnings = profile.showLowStockWarnings !== undefined ? profile.showLowStockWarnings : true;
         profile.autoBackupFrequency = profile.autoBackupFrequency || 7;
-        // Only set lowStockThreshold if it's not already set
-        if (profile.lowStockThreshold === undefined || profile.lowStockThreshold === 0) {
-          profile.lowStockThreshold = 5;
+        // Only set lowStockThreshold if it's not already set (nullish)
+        if (profile.lowStockThreshold === undefined || profile.lowStockThreshold === null) {
+          profile.lowStockThreshold = 0;
         }
       });
     });
@@ -390,6 +391,25 @@ class NexTrackDB extends Dexie {
         supplier.createdAt = supplier.createdAt || new Date().toISOString();
         supplier.updatedAt = supplier.updatedAt || new Date().toISOString();
       });
+    });
+
+    // Version 7 - Add firebaseUid field to users for Firebase Auth integration
+    this.version(7).stores({
+      users: '++id, &email, firebaseUid, createdAt',
+      sessions: '++id, userId, token, expiresAt',
+      organizations: '++id, name, ownerId, createdAt, updatedAt',
+      userOrganizations: '++id, userId, organizationId, role, joinedAt',
+      products: '++id, name, description, sku, brand, category, supplier, costPrice, salePrice, stock, minStock, userId, organizationId, createdAt, updatedAt',
+      salesOrders: '++id, customer, date, status, paymentStatus, userId, organizationId',
+      purchaseOrders: '++id, supplier, date, status, paymentStatus, userId, organizationId',
+      invoices: '++id, relatedOrderId, type, date, userId, organizationId',
+      inventoryHistory: '++id, productId, date, reason, userId, organizationId',
+      categories: '++id, name, userId, organizationId',
+      brands: '++id, name, userId, organizationId',
+      suppliers: '++id, name, address, userId, organizationId, createdAt, updatedAt',
+      userProfile: 'id, userId, organizationId, website, socialLinks, logoUrl',
+      settings: '&key, value, userId, organizationId',
+      changeLeft: '++id, orderId, customerName, status, createdAt, userId, organizationId',
     });
   }
 

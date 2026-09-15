@@ -75,7 +75,7 @@ const Reports = () => {
   const [grossProfit, setGrossProfit] = useState(0);
   const [operatingExpenses, setOperatingExpenses] = useState(0);
   const [netProfit, setNetProfit] = useState(0);
-  const [filteredSales, setFilteredSales] = useState<any[]>([]);
+  const [filteredSales, setFilteredSales] = useState<unknown[]>([]);
 
   useEffect(() => {
     const loadReport = async () => {
@@ -192,7 +192,7 @@ const Reports = () => {
         // Calculate product performance
         const productPerformanceData: ProductPerformance[] = userProducts.map(product => {
           const productSales = filteredSales.flatMap(order => 
-            order.items.filter((item: any) => item.productId === product.id)
+            (order as { items: Array<{ productId: number; quantity: number; price: number }> }).items.filter((item) => item.productId === product.id)
           );
           const revenue = productSales.reduce((sum, item) => sum + (item.quantity * item.price), 0);
           const quantitySold = productSales.reduce((sum, item) => sum + item.quantity, 0);
@@ -269,7 +269,7 @@ const Reports = () => {
     };
 
     loadReport();
-  }, [startDate, endDate, user, userProducts]);
+  }, [startDate, endDate, user, userProducts, salesRevenue, totalCOGS, grossProfit, operatingExpenses, netProfit, filteredSales]);
 
   const formatCurrency = (value: number) => {
     return `₦${value.toLocaleString('en-NG', {
@@ -635,7 +635,7 @@ const Reports = () => {
 
   const handleExportExcel = () => {
     // Prepare comprehensive data for Excel export with chart data points
-    let exportData: Record<string, unknown>[] = [];
+    const exportData: Record<string, unknown>[] = [];
     
     // Add metadata
     exportData.push({
@@ -653,7 +653,7 @@ const Reports = () => {
     switch (activeTab) {
       case 'overview':
         // Financial Summary
-        exportData.push(...report.map(item => ({
+        { exportData.push(...report.map(item => ({
           Category: 'Financial Summary',
           Metric: item.label,
           Value: item.value,
@@ -692,11 +692,11 @@ const Reports = () => {
           'Formatted CAC': filteredSales.length > 0 ? formatCurrency((operatingExpenses * 0.3) / Math.max(1, filteredSales.length)) : '₦0.00',
           'Inventory Turnover': totalCOGS > 0 && inventoryHealth?.totalInventoryValue ? ((totalCOGS / inventoryHealth.totalInventoryValue) * 12).toFixed(1) + 'x' : '0.0x'
         });
-        break;
+        break; }
         
       case 'products':
         // Product Performance with enhanced metrics
-        exportData.push(...productPerformance.map((item, index) => ({
+        { exportData.push(...productPerformance.map((item, index) => ({
           Category: 'Product Performance',
           Rank: index + 1,
           'Product ID': item.productId,
@@ -724,11 +724,11 @@ const Reports = () => {
           'Profitable Products': productPerformance.filter(p => p.profitMargin >= 0).length,
           'Loss Making Products': productPerformance.filter(p => p.profitMargin < 0).length
         });
-        break;
+        break; }
         
       case 'inventory':
         // Inventory Health Summary
-        if (inventoryHealth) {
+        { if (inventoryHealth) {
           exportData.push({
             Category: 'Inventory Summary',
             'Total Products': inventoryHealth.totalProducts,
@@ -755,11 +755,11 @@ const Reports = () => {
           'Inventory Health Score': inventoryHealth ? Math.max(0, 100 - (inventoryHealth.lowStockCount * 5) - (inventoryHealth.outOfStockCount * 10)) : 0,
           'Reorder Urgency': inventoryHealth && inventoryHealth.lowStockCount > 0 ? 'High' : inventoryHealth && inventoryHealth.outOfStockCount > 0 ? 'Critical' : 'Normal'
         });
-        break;
+        break; }
         
       case 'trends':
         // Monthly Trends Data
-        exportData.push(...chartData.map((item, index) => ({
+        { exportData.push(...chartData.map((item, index) => ({
           Category: 'Monthly Trends',
           Month: item.name,
           Revenue: item.revenue,
@@ -793,7 +793,7 @@ const Reports = () => {
           'Worst Month Revenue': Math.min(...chartData.map(item => item.revenue), 0),
           'Formatted Worst Month': formatCurrency(Math.min(...chartData.map(item => item.revenue), 0))
         });
-        break;
+        break; }
     }
 
     exportToCSV(exportData, `nextrack_${activeTab}_report_${format(new Date(), 'yyyy-MM-dd_HH-mm')}`);
@@ -897,12 +897,12 @@ const Reports = () => {
 
       {/* Navigation Tabs */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-1 mb-6">
-        <div className="flex space-x-1">
+        <div className="flex flex-wrap gap-1">
           {(['overview', 'products', 'inventory', 'trends'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+              className={`flex-1 min-w-[8rem] px-4 py-2.5 text-sm font-medium rounded-lg transition-colors min-h-[44px] ${
                 activeTab === tab
                   ? 'bg-blue-600 text-white shadow-sm'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
@@ -970,7 +970,7 @@ const Reports = () => {
           {activeTab === 'overview' && (
             <div className="space-y-6">
               {/* KPI Cards */}
-              <div className="grid grid-cols-1 md:grid-rows-2 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
                 {report.map((item) => (
                   <div key={item.label} className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                     <div className="flex items-center justify-between mb-3">

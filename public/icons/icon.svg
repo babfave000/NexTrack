@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="NexTrack app icon">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#065f46"/>
+      <stop offset="55%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+  </defs>
+  <rect x="32" y="32" width="448" height="448" rx="112" ry="112" fill="url(#bgGrad)"/>
+  <g fill="#ffffff" transform="translate(116 116)">
+    <path d="M42 280 L42 94 L106 94 C142 94 162 110 162 138 C162 158 152 172 134 180 L176 280 L114 280 L84 194 L64 194 L64 280 Z" opacity="0"/>
+    <path d="M56 90 h58 c30 0 50 14 50 40 s-20 40 -50 40 h-18 l58 120 h-62 l-36 -82 h-20 v82 h-36 v-200 h94 z m-58 134 h80 c14 0 22 -6 22 -18 s-8 -18 -22 -18 h-80 v36 z" fill="#ffffff" fill-rule="evenodd"/>
+  </g>
+  <g transform="translate(320 332)">
+    <rect x="0" y="72" width="30" height="48" rx="6" fill="#ffffff" opacity="0.95"/>
+    <rect x="42" y="34" width="30" height="86" rx="6" fill="#ffffff" opacity="0.95"/>
+    <rect x="84" y="0" width="30" height="120" rx="6" fill="url(#accentGrad)"/>
+  </g>
+  <circle cx="398" cy="114" r="18" fill="#fbbf24"/>
+</svg>

@@ -1,4 +1,3 @@
-// src/pages/Support/ContactUsPage.tsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -26,7 +25,6 @@ export default function ContactUsPage() {
     setIsSubmitting(true);
 
     try {
-      // Send form using Formspree with proper configuration
       const formDataToSend = {
         name: formData.name,
         email: formData.email,
@@ -35,7 +33,6 @@ export default function ContactUsPage() {
         message: formData.message
       };
 
-      // Add honeypot field for spam protection
       const formDataWithHoneypot = {
         ...formDataToSend,
         'form-name': 'contactForm',
@@ -77,12 +74,10 @@ export default function ContactUsPage() {
       console.error('Contact form error:', error);
       setIsSubmitting(false);
       
-      // Detailed error message for debugging
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       console.error('Full error details:', errorMessage);
       
-      // User-friendly error message
-      alert(`Failed to send message: ${errorMessage}. Please:\n\n1. Check your internet connection\n2. Try again later\n3. Contact us directly at nexaisystemshub@gmail.com`);
+      alert(`Failed to send message: ${errorMessage}. Please:\n\n1. Check your internet connection\n2. Try again later\n3. Contact us directly at nextrack.ink@gmail.com`);
     }
   };
 
@@ -91,29 +86,33 @@ export default function ContactUsPage() {
       icon: '📧',
       title: 'Email Support',
       description: 'Send us an email and we\'ll respond within 24 hours',
-      contact: 'nexaisystemshub@gmail.com',
-      action: 'mailto:nexaisystemshub@gmail.com'
+      contact: 'nextrack.ink@gmail.com',
+      action: 'mailto:nextrack.ink@gmail.com',
+      accent: 'emerald'
     },
     {
       icon: '💬',
       title: 'Live Chat',
       description: 'Chat with our support team during business hours',
-      contact: 'Available 9AM-6PM EST',
-      action: '#'
+      contact: 'Available 9AM-6PM WAT',
+      action: '#',
+      accent: 'teal'
     },
     {
       icon: '📞',
       title: 'Phone Support',
       description: 'Call us for immediate assistance',
-      contact: '+1 (555) 123-4567',
-      action: 'tel:+2348075608337'
+      contact: '+234 807 560 8337',
+      action: 'tel:+2348075608337',
+      accent: 'amber'
     },
     {
       icon: '📍',
       title: 'Office Address',
       description: 'Visit our headquarters',
-      contact: '123 Business Ave, Suite 100, New Jersey',
-      action: '#'
+      contact: 'Lagos, Nigeria',
+      action: 'https://maps.google.com/?q=Lagos,Nigeria',
+      accent: 'rose'
     }
   ];
 
@@ -126,14 +125,20 @@ export default function ContactUsPage() {
     { value: 'feedback', label: 'Feedback' }
   ];
 
+  const accentClasses = {
+    emerald: { bg: 'bg-emerald-100', text: 'text-emerald-600', hover: 'hover:text-emerald-700' },
+    teal: { bg: 'bg-teal-100', text: 'text-teal-600', hover: 'hover:text-teal-700' },
+    amber: { bg: 'bg-amber-100', text: 'text-amber-600', hover: 'hover:text-amber-700' },
+    rose: { bg: 'bg-rose-100', text: 'text-rose-600', hover: 'hover:text-rose-700' },
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
-              <Link to="/dashboard" className="text-xl font-bold text-blue-600">
+              <Link to="/dashboard" className="text-xl font-bold text-emerald-700">
                 NexTrack
               </Link>
               <div className="text-sm text-gray-500">Contact Us</div>
@@ -143,7 +148,7 @@ export default function ContactUsPage() {
                 to="/help"
                 className="text-gray-600 hover:text-gray-900 text-sm font-medium"
               >
-                Help & Support
+                Help &amp; Support
               </Link>
               <Link
                 to="/dashboard"
@@ -157,7 +162,6 @@ export default function ContactUsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Contact Us
@@ -168,14 +172,13 @@ export default function ContactUsPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Form */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h2>
             
             {isSubmitted ? (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-green-600 text-2xl">✓</span>
+              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center">
+                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-emerald-600 text-2xl">✓</span>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Message Sent!</h3>
                 <p className="text-gray-600 mb-4">
@@ -183,7 +186,7 @@ export default function ContactUsPage() {
                 </p>
                 <button
                   onClick={() => setIsSubmitted(false)}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md font-medium"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl font-medium transition-colors"
                 >
                   Send Another Message
                 </button>
@@ -192,7 +195,7 @@ export default function ContactUsPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="name" className="block text-sm font-semibold text-gray-800 mb-2">
                       Full Name *
                     </label>
                     <input
@@ -202,12 +205,13 @@ export default function ContactUsPage() {
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white transition-all"
+                      style={{ fontSize: '16px' }}
                       placeholder="Your full name"
                     />
                   </div>
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-2">
                       Email Address *
                     </label>
                     <input
@@ -217,7 +221,8 @@ export default function ContactUsPage() {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white transition-all"
+                      style={{ fontSize: '16px' }}
                       placeholder="your.email@example.com"
                     />
                   </div>
@@ -225,7 +230,7 @@ export default function ContactUsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="subject" className="block text-sm font-semibold text-gray-800 mb-2">
                       Subject *
                     </label>
                     <input
@@ -235,12 +240,13 @@ export default function ContactUsPage() {
                       value={formData.subject}
                       onChange={handleChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white transition-all"
+                      style={{ fontSize: '16px' }}
                       placeholder="Brief subject line"
                     />
                   </div>
                   <div>
-                    <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="category" className="block text-sm font-semibold text-gray-800 mb-2">
                       Category *
                     </label>
                     <select
@@ -249,7 +255,8 @@ export default function ContactUsPage() {
                       value={formData.category}
                       onChange={handleChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white transition-all"
+                      style={{ fontSize: '16px' }}
                     >
                       <option value="">Select a category</option>
                       {supportCategories.map((category) => (
@@ -262,7 +269,7 @@ export default function ContactUsPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="message" className="block text-sm font-semibold text-gray-800 mb-2">
                     Message *
                   </label>
                   <textarea
@@ -272,7 +279,8 @@ export default function ContactUsPage() {
                     onChange={handleChange}
                     required
                     rows={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:bg-white transition-all resize-none"
+                    style={{ fontSize: '16px' }}
                     placeholder="Please describe your issue or question in detail..."
                   />
                 </div>
@@ -280,7 +288,7 @@ export default function ContactUsPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white py-3.5 px-4 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-600/20 hover:shadow-xl hover:shadow-emerald-600/25 hover:-translate-y-0.5"
                 >
                   {isSubmitting ? 'Sending Message...' : 'Send Message'}
                 </button>
@@ -288,45 +296,52 @@ export default function ContactUsPage() {
             )}
           </div>
 
-          {/* Contact Information */}
           <div className="space-y-8">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Other Ways to Reach Us</h2>
               <div className="grid grid-cols-1 gap-6">
-                {contactMethods.map((method, index) => (
-                  <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-blue-600 text-xl">{method.icon}</span>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                          {method.title}
-                        </h3>
-                        <p className="text-gray-600 mb-3">
-                          {method.description}
-                        </p>
-                        {method.action.startsWith('http') || method.action.startsWith('mailto') || method.action.startsWith('tel') ? (
-                          <a
-                            href={method.action}
-                            className="text-blue-600 hover:text-blue-700 font-medium"
-                          >
-                            {method.contact}
-                          </a>
-                        ) : (
-                          <p className="text-gray-900 font-medium whitespace-pre-line">
-                            {method.contact}
-                          </p>
-                        )}
+                {contactMethods.map((method, index) => {
+                  const a = accentClasses[method.accent as keyof typeof accentClasses];
+                  return (
+                    <div
+                      key={index}
+                      className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start space-x-4">
+                        <div
+                          className={`w-12 h-12 ${a.bg} rounded-xl flex items-center justify-center flex-shrink-0`}
+                        >
+                          <span className={`${a.text} text-xl`}>{method.icon}</span>
+                        </div>
+
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            {method.title}
+                          </h3>
+                          <p className="text-gray-600 mb-3">{method.description}</p>
+                          {method.action.startsWith('http') ||
+                          method.action.startsWith('mailto') ||
+                          method.action.startsWith('tel') ? (
+                            <a
+                              href={method.action}
+                              className={`${a.text} ${a.hover} font-semibold transition-colors`}
+                            >
+                              {method.contact}
+                            </a>
+                          ) : (
+                            <p className="text-gray-900 font-medium whitespace-pre-line">
+                              {method.contact}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
-            {/* Business Hours */}
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+            <div className="bg-emerald-50 rounded-2xl border border-emerald-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Support Hours</h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
@@ -342,7 +357,7 @@ export default function ContactUsPage() {
                   <span className="font-medium">Closed</span>
                 </div>
               </div>
-              <div className="mt-4 pt-4 border-t border-blue-200">
+              <div className="mt-4 pt-4 border-t border-emerald-200">
                 <p className="text-sm text-gray-600">
                   Emergency support available for critical issues outside business hours.
                 </p>

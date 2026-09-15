@@ -1,6 +1,8 @@
 // src/components/Inventory/ProductForm.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { type Product } from '../../db/dexie';
+import { generateSKU } from '../../db/operations/products';
+import { useUserData } from '../../hooks/useUserData';
 
 interface ProductFormProps {
   product?: Product;
@@ -17,6 +19,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
   onCancel, 
   isLoading = false 
 }) => {
+  const { user } = useUserData();
+  const autoSkuLastGeneratedFrom = useRef<string>('');
+  const isEditingExisting = Boolean(product?.id);
   const [formData, setFormData] = useState({
     name: '',
     sku: '',
@@ -27,7 +32,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     brand: '',
     supplier: '',
     category: '',
-    lowStockThreshold: 10,
+    lowStockThreshold: 0,
     userId: 0
   });
 
@@ -52,11 +57,50 @@ const ProductForm: React.FC<ProductFormProps> = ({
         brand: product.brand || '',
         supplier: product.supplier || '',
         category: product.category || '',
-        lowStockThreshold: product.lowStockThreshold || 10,
+        lowStockThreshold: product.lowStockThreshold ?? 0,
         userId: product.userId || 0
       });
+      autoSkuLastGeneratedFrom.current = product.name || '';
     }
   }, [product]);
+
+  useEffect(() => {
+    // Live-generate SKU for new products. If user already typed a custom
+    // SKU that doesn't match the auto-gen pattern for the current name,
+    // we leave it alone (respects manual edits).
+    if (isEditingExisting) return;
+    const trimmedName = formData.name.trim();
+    if (!trimmedName) {
+      if (!formData.sku || formData.sku === autoSkuLastGeneratedFrom.current + '-AUTO') {
+        setFormData(prev => (prev.sku ? { ...prev, sku: '' } : prev));
+      }
+      autoSkuLastGeneratedFrom.current = '';
+      return;
+    }
+    // Skip if the user appears to have manually edited the SKU
+    const expectedPrefix = trimmedName.substring(0, 3).toUpperCase();
+    const alreadyAuto = autoSkuLastGeneratedFrom.current &&
+      formData.sku.startsWith(autoSkuLastGeneratedFrom.current.substring(0, 3).toUpperCase() + '-');
+    const matchesPrefix = !formData.sku || formData.sku.startsWith(expectedPrefix + '-') || alreadyAuto;
+    if (!matchesPrefix) return;
+
+    let cancelled = false;
+    (async () => {
+      if (!user?.id) return;
+      const generated = await generateSKU(trimmedName, user.id);
+      if (cancelled) return;
+      setFormData(prev => {
+        const currentPrefix = trimmedName.substring(0, 3).toUpperCase();
+        const prevWasAuto = autoSkuLastGeneratedFrom.current &&
+          prev.sku.startsWith(autoSkuLastGeneratedFrom.current.substring(0, 3).toUpperCase() + '-');
+        const stillMatches = !prev.sku || prev.sku.startsWith(currentPrefix + '-') || prevWasAuto;
+        if (!stillMatches) return prev;
+        return { ...prev, sku: generated };
+      });
+      autoSkuLastGeneratedFrom.current = trimmedName;
+    })();
+    return () => { cancelled = true; };
+  }, [formData.name, user?.id, isEditingExisting, formData.sku]);
 
   useEffect(() => {
     // Extract unique brands and suppliers from existing products
@@ -81,10 +125,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
     if (!formData.name.trim()) {
       newErrors.name = 'Product name is required';
-    }
-
-    if (!formData.sku.trim()) {
-      newErrors.sku = 'SKU is required';
     }
 
     if (formData.stock < 0) {
@@ -171,21 +211,42 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
           {/* SKU */}
           <div>
-            <label htmlFor="sku" className="block text-sm font-medium text-gray-700 mb-1">
-              SKU *
-            </label>
-            <input
-              type="text"
-              id="sku"
-              name="sku"
-              value={formData.sku}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter SKU"
-            />
+            <div className="flex items-center justify-between mb-1">
+              <label htmlFor="sku" className="block text-sm font-medium text-gray-700">
+                SKU
+              </label>
+              <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                isEditingExisting
+                  ? 'bg-slate-100 text-slate-700 border border-slate-200'
+                  : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+              }`}>
+                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70"></span>
+                {isEditingExisting ? 'Preserved' : 'Auto-generated'}
+              </span>
+            </div>
+            <div className="relative">
+              <input
+                type="text"
+                id="sku"
+                name="sku"
+                value={formData.sku}
+                onChange={handleChange}
+                readOnly={!isEditingExisting}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 ${
+                  isEditingExisting
+                    ? 'border-gray-300 bg-white'
+                    : 'border-gray-200 bg-gray-50 text-gray-700 cursor-default'
+                }`}
+                placeholder={isEditingExisting ? 'Product SKU' : 'Enter product name to generate'}
+              />
+            </div>
             {errors.sku && <p className="text-red-500 text-xs mt-1">{errors.sku}</p>}
             <p className="text-xs text-gray-500 mt-1">
-              {formData.name ? `Will generate: ${formData.name.substring(0, 3).toUpperCase()}-001` : 'Enter product name first'}
+              {isEditingExisting
+                ? 'Edit if needed — SKU is kept when updating.'
+                : formData.name
+                  ? `Generated from product name, auto-incrementing counter.`
+                  : 'Type a product name above to generate a unique SKU automatically.'}
             </p>
           </div>
 

@@ -133,7 +133,7 @@
 
 .inventory-list-panel { box-shadow: none; border: 0; border-radius: 0; }
 
-@media (max-width: 760px) {
+@media (max-width: 767px) {
   .dashboard-heading {
     align-items: stretch;
     flex-direction: column;
@@ -564,7 +564,7 @@ textarea.input-error:focus {
 
 /* ---- RESPONSIVENESS ---- */
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .field-group {
     margin-bottom: 0.75rem;
   }
@@ -873,7 +873,7 @@ textarea.input-error:focus {
   color: #ffffff;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .welcome-headline {
     font-size: 1.875rem;
   }
