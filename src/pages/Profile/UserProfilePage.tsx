@@ -125,6 +125,9 @@ export default function UserProfilePage() {
       };
       
       await updateUserProfile(profileToSave, profileId);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('nextrack:profile-saved', { detail: { source: 'profile-page' } }));
+      }
       setSavedMessage('Profile updated successfully');
       setTimeout(() => setSavedMessage(''), 3000);
     } catch (error) {

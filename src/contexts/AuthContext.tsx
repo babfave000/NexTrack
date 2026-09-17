@@ -5,6 +5,7 @@ import { db } from '../db/dexie';
 import type { User, Session, UserProfile } from '../db/dexie';
 import { initializeDatabase } from '../utils/dataMigration';
 import { firebaseService } from '../services/firebaseService';
+import { firebaseSyncService } from '../services/cloudSync/firebaseSyncService';
 import type { User as FirebaseUser } from 'firebase/auth';
 
 interface AuthContextType {
@@ -282,6 +283,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 // Initial mount (existing user restored from cache) — log softly.
                 console.debug('Restored existing Firebase mirror user:', dexieUser.email);
               }
+              // Kick off cloud sync automatically for Firebase-backed users
+              // so their inventories / profile / settings travel to other
+              // devices. Dexie-only / anonymous users skip this path.
+              void firebaseSyncService.autoEnableForFirebaseUser(fbUser.uid);
             } catch (err) {
               console.error('Failed to provision user from Firebase auth change:', err);
             }

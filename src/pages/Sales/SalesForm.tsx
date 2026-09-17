@@ -428,11 +428,11 @@ const SalesForm = ({ orderId, onSave, onCancel, userId }: SalesFormProps) => {
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-3 justify-end">
+        <div className="form-actions flex flex-wrap gap-3 justify-end">
           <button 
             type="button" 
             onClick={onCancel}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded"
+            className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded min-h-[44px]"
             disabled={isSaving}
           >
             Cancel
@@ -443,7 +443,7 @@ const SalesForm = ({ orderId, onSave, onCancel, userId }: SalesFormProps) => {
               <button 
                 type="button" 
                 onClick={handleSaveAsDraft}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded disabled:opacity-50"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded disabled:opacity-50 min-h-[44px]"
                 disabled={isSaving}
               >
                 {isSaving ? 'Saving...' : 'Save as Draft'}
@@ -453,7 +453,7 @@ const SalesForm = ({ orderId, onSave, onCancel, userId }: SalesFormProps) => {
                 type="button" 
                 onClick={handleApproveOrder}
                 disabled={hasLowStockItems || isSaving}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
               >
                 {isSaving ? 'Processing...' : 'Approve Order'}
               </button>
@@ -464,7 +464,7 @@ const SalesForm = ({ orderId, onSave, onCancel, userId }: SalesFormProps) => {
             <button 
               type="button" 
               onClick={() => saveOrder('approved')}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded disabled:opacity-50"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded disabled:opacity-50 min-h-[44px]"
               disabled={isSaving}
             >
               {isSaving ? 'Updating...' : 'Update Payment Status'}

@@ -1,5 +1,5 @@
 // src/contexts/SettingsContext.tsx
-import React, { createContext, useState, useEffect, type ReactNode } from 'react';
+import React, { createContext, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useUserData } from '../hooks/useUserData';
 import { db } from '../db/dexie';
 import type { UserProfile } from '../db/dexie';
@@ -14,7 +14,11 @@ interface SettingsContextType {
   settings: Settings;
   updateSettings: (newSettings: Partial<Settings>) => Promise<void>;
   isLoading: boolean;
+  businessInfo: Pick<UserProfile, 'businessName' | 'logoUrl' | 'email' | 'phone' | 'address' | 'website' | 'socialLinks'> | null;
+  refreshBusinessInfo: () => Promise<void>;
 }
+
+type BusinessInfo = Pick<UserProfile, 'businessName' | 'logoUrl' | 'email' | 'phone' | 'address' | 'website' | 'socialLinks'> | null;
 
 // Default settings - these are only used as fallback if no user profile exists
 const defaultSettings: Settings = {
@@ -24,6 +28,19 @@ const defaultSettings: Settings = {
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
+
+const extractBusinessInfo = (p: UserProfile | undefined): BusinessInfo => {
+  if (!p) return null;
+  return {
+    businessName: p.businessName || '',
+    logoUrl: p.logoUrl || '',
+    email: p.email || '',
+    phone: p.phone || '',
+    address: p.address || '',
+    website: p.website || '',
+    socialLinks: p.socialLinks || '',
+  };
+};
 
 // Helper functions for UserProfile operations
 const getUserProfile = async (userId: number): Promise<UserProfile | undefined> => {
@@ -54,56 +71,67 @@ const updateUserProfile = async (profile: UserProfile, userId: number): Promise<
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { isAuthenticated, user } = useUserData();
   const [settings, setSettings] = useState<Settings>(defaultSettings);
+  const [businessInfo, setBusinessInfo] = useState<BusinessInfo>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const loadedUserIdRef = useRef<number | undefined>(undefined);
 
-  // Load settings from database
-  useEffect(() => {
-    const loadSettings = async () => {
-      if (!user) {
-        setIsLoading(false);
-        setHasLoaded(true);
-        return;
-      }
-      
-      try {
-        setIsLoading(true);
-        await db.ensureOpen();
-        const userProfile = await getUserProfile(user.id!);
-        
-        if (userProfile) {
-          // Use the saved settings from user profile exactly as stored
-          const loadedSettings: Settings = {
-            lowStockThreshold: userProfile.lowStockThreshold,
-            showLowStockWarnings: userProfile.showLowStockWarnings,
-            autoBackupFrequency: userProfile.autoBackupFrequency
-          };
-          setSettings(loadedSettings);
-          console.log('Settings loaded from user profile:', loadedSettings);
-        } else {
-          // No user profile exists yet, use default settings
-          console.log('No user profile found, using default settings:', defaultSettings);
-          setSettings(defaultSettings);
-        }
-        
-        setHasLoaded(true);
-      } catch (error) {
-        console.error('Error loading settings:', error);
-        // On error, use default settings
-        setSettings(defaultSettings);
-        setHasLoaded(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (isAuthenticated && user && !hasLoaded) {
-      loadSettings();
-    } else if (!isAuthenticated && !hasLoaded) {
+  const loadSettings = useCallback(async () => {
+    if (!user) {
       setIsLoading(false);
-      setHasLoaded(true);
+      return;
     }
-  }, [user, isAuthenticated, hasLoaded]);
+    try {
+      setIsLoading(true);
+      await db.ensureOpen();
+      const userProfile = await getUserProfile(user.id!);
+
+      if (userProfile) {
+        const loadedSettings: Settings = {
+          lowStockThreshold: userProfile.lowStockThreshold ?? defaultSettings.lowStockThreshold,
+          showLowStockWarnings: userProfile.showLowStockWarnings ?? defaultSettings.showLowStockWarnings,
+          autoBackupFrequency: userProfile.autoBackupFrequency ?? defaultSettings.autoBackupFrequency
+        };
+        setSettings(loadedSettings);
+        setBusinessInfo(extractBusinessInfo(userProfile));
+        console.log('Settings loaded from user profile:', loadedSettings);
+      } else {
+        console.log('No user profile found, using default settings:', defaultSettings);
+        setSettings(defaultSettings);
+        setBusinessInfo(null);
+      }
+    } catch (error) {
+      console.error('Error loading settings:', error);
+      setSettings(defaultSettings);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user]);
+
+  // Initial load: run whenever the authenticated user changes.
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      setSettings(defaultSettings);
+      setBusinessInfo(null);
+      setIsLoading(false);
+      loadedUserIdRef.current = undefined;
+      return;
+    }
+    if (loadedUserIdRef.current === user.id) return;
+    loadedUserIdRef.current = user.id;
+    void loadSettings();
+  }, [isAuthenticated, user, loadSettings]);
+
+  // React to profile edits on the local device and to incoming cross-device syncs.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const reload = () => { void loadSettings(); };
+    window.addEventListener('nextrack:profile-saved', reload);
+    window.addEventListener('nextrack:profile-synced', reload);
+    return () => {
+      window.removeEventListener('nextrack:profile-saved', reload);
+      window.removeEventListener('nextrack:profile-synced', reload);
+    };
+  }, [loadSettings]);
 
   const updateSettings = async (newSettings: Partial<Settings>) => {
     if (!user) return;
@@ -148,6 +176,8 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
 
       await db.ensureOpen();
       await updateUserProfile(currentProfile, user.id!);
+      // Also refresh businessInfo cache so any derived displays stay in sync
+      setBusinessInfo(extractBusinessInfo(currentProfile));
       console.log('Settings saved to user profile:', updatedSettings);
       
     } catch (error) {
@@ -156,9 +186,8 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
       setSettings(prev => {
         const reverted: Settings = { ...prev };
         (Object.keys(newSettings) as Array<keyof Settings>).forEach(() => {
-          // We don't have the previous raw value handy; best-effort: read from
-          // defaultSettings for new keys and otherwise leave existing values.
-          // This is intentionally conservative.
+          // We don't have the previous raw value handy; best-effort: just keep
+          // the existing previous state.
         });
         return reverted;
       });
@@ -166,8 +195,16 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   };
 
+  const value: SettingsContextType = {
+    settings,
+    updateSettings,
+    isLoading,
+    businessInfo,
+    refreshBusinessInfo: loadSettings,
+  };
+
   return (
-    <SettingsContext.Provider value={{ settings, updateSettings, isLoading }}>
+    <SettingsContext.Provider value={value}>
       {children}
     </SettingsContext.Provider>
   );

@@ -44,6 +44,7 @@ export interface UserOrganization {
 }
 
 export interface Product {
+  firebaseUid?: string;
   category: string;
   id?: number;
   name: string;

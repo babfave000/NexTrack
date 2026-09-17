@@ -155,7 +155,9 @@ export default function FirebaseTest() {
         updatedAt: new Date().toISOString(),
         userId: user?.id || 1 // Use user's ID or fallback to 1
         ,
-        category: ''
+
+        category: '',
+        firebaseUid: ''
       });
 
       setTestResult('✅ Test data added locally. Now syncing to Firebase...');

@@ -270,13 +270,13 @@ export default function PurchasePage({ initialTab = 'new' }: PurchasePageProps) 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+      <div className="sp-header flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Purchase Orders</h1>
           <p className="text-gray-600 mt-1">Manage supplier orders and inventory restocking</p>
         </div>
         
-        <div className="flex flex-wrap gap-2 items-center">
+        <div className="sp-header-tabs flex flex-wrap gap-2 items-center">
           <button
             onClick={() => setActiveTab('new')}
             className={`min-h-[44px] px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -710,8 +710,9 @@ export default function PurchasePage({ initialTab = 'new' }: PurchasePageProps) 
           {items.length > 0 && (
             <div className="mb-6">
               <h3 className="font-medium text-gray-700 mb-4">Order Items</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full divide-y divide-gray-200">
+              <div className="table-scroll">
+                <div className="overflow-x-auto min-w-[640px]">
+                  <table className="w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
@@ -745,6 +746,7 @@ export default function PurchasePage({ initialTab = 'new' }: PurchasePageProps) 
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             </div>
           )}
@@ -753,7 +755,7 @@ export default function PurchasePage({ initialTab = 'new' }: PurchasePageProps) 
           <button
             onClick={savePurchaseOrder}
             disabled={items.length === 0 || isSaving}
-            className="w-full bg-green-600 text-white px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-2"
+            className="w-full bg-green-600 text-white px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-2 min-h-[48px]"
           >
             {isSaving ? (
               <>
@@ -783,9 +785,10 @@ export default function PurchasePage({ initialTab = 'new' }: PurchasePageProps) 
           </div>
 
           {userPurchaseOrders && userPurchaseOrders.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className="table-scroll">
+              <div className="overflow-x-auto min-w-[640px]">
+                <table className="w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplier</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
@@ -876,6 +879,7 @@ export default function PurchasePage({ initialTab = 'new' }: PurchasePageProps) 
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           ) : (
             <div className="text-center py-12 text-gray-400">

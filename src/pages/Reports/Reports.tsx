@@ -1,5 +1,5 @@
 // src/pages/Reports/Reports.tsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { format, parseISO, subDays, startOfMonth, endOfMonth, eachMonthOfInterval } from 'date-fns';
 import { useUserData } from '../../hooks/useUserData';
 import { getSalesStats, getPurchaseStats, getLowStockProducts } from '../../db/operations';
@@ -77,10 +77,13 @@ const Reports = () => {
   const [netProfit, setNetProfit] = useState(0);
   const [filteredSales, setFilteredSales] = useState<unknown[]>([]);
 
+  const reportLoadInFlight = useRef<number>(0);
+
   useEffect(() => {
     const loadReport = async () => {
       if (!user || !userProducts) return;
-      
+
+      const myTicket = ++reportLoadInFlight.current;
       setIsLoading(true);
       try {
         const start = parseISO(startDate);
@@ -95,6 +98,10 @@ const Reports = () => {
           getLowStockProducts(user.id!)
         ]);
 
+        if (reportLoadInFlight.current !== myTicket) {
+          return;
+        }
+
         // Filter data by date range (inclusive)
         const salesDataFiltered = salesData.orders.filter((order) => {
           const orderDate = parseISO(order.date);
@@ -104,14 +111,6 @@ const Reports = () => {
         const purchasesDataFiltered = purchaseData.orders.filter((order) => {
           const orderDate = parseISO(order.date);
           return orderDate >= start && orderDate <= end;
-        });
-
-        console.log('Filtered data:', { 
-          totalSales: salesData.orders.length, 
-          filteredSales: salesDataFiltered.length,
-          totalPurchases: purchaseData.orders.length,
-          filteredPurchases: purchasesDataFiltered.length,
-          dateRange: { startDate, endDate }
         });
 
         // Calculate financial metrics
@@ -132,14 +131,6 @@ const Reports = () => {
         const calculatedOperatingExpenses = purchasesDataFiltered.reduce((sum, order) => sum + order.total, 0) * 0.15; // Use 15% as overhead estimate
         const calculatedNetProfit = calculatedGrossProfit - calculatedOperatingExpenses;
 
-        // Set state variables
-        setFilteredSales(salesDataFiltered);
-        setSalesRevenue(calculatedSalesRevenue);
-        setTotalCOGS(calculatedTotalCOGS);
-        setGrossProfit(calculatedGrossProfit);
-        setOperatingExpenses(calculatedOperatingExpenses);
-        setNetProfit(calculatedNetProfit);
-
         // Calculate inventory health
         const totalInventoryValue = userProducts.reduce((sum, product) => 
           sum + (product.stock * (product.costPrice || 0)), 0
@@ -149,8 +140,7 @@ const Reports = () => {
 
         // Generate chart data (monthly breakdown)
         const months = eachMonthOfInterval({ start, end });
-        console.log('Date range:', { start, end, monthsCount: months.length });
-        
+
         const monthlyData = months.map(month => {
           const monthStart = startOfMonth(month);
           const monthEnd = endOfMonth(month);
@@ -191,8 +181,8 @@ const Reports = () => {
 
         // Calculate product performance
         const productPerformanceData: ProductPerformance[] = userProducts.map(product => {
-          const productSales = filteredSales.flatMap(order => 
-            (order as { items: Array<{ productId: number; quantity: number; price: number }> }).items.filter((item) => item.productId === product.id)
+          const productSales = salesDataFiltered.flatMap(order =>
+            order.items.filter((item) => item.productId === product.id)
           );
           const revenue = productSales.reduce((sum, item) => sum + (item.quantity * item.price), 0);
           const quantitySold = productSales.reduce((sum, item) => sum + item.quantity, 0);
@@ -217,38 +207,50 @@ const Reports = () => {
           ((monthlyData[monthlyData.length - 1].profit - monthlyData[0].profit) / Math.abs(monthlyData[0].profit || 1)) * 100 : 0;
         const expenseTrend = monthlyData.length >= 2 ? 
           ((monthlyData[monthlyData.length - 1].expenses - monthlyData[0].expenses) / Math.abs(monthlyData[0].expenses || 1)) * 100 : 0;
+        const netProfitTrend = calculatedNetProfit >= 0
+          ? revenueTrend
+          : -Math.abs(expenseTrend);
 
-        // Set report data
+        // Set state for derived financial displays (KPI strip + any downstream consumers)
+        setFilteredSales(salesDataFiltered);
+        setSalesRevenue(calculatedSalesRevenue);
+        setTotalCOGS(calculatedTotalCOGS);
+        setGrossProfit(calculatedGrossProfit);
+        setOperatingExpenses(calculatedOperatingExpenses);
+        setNetProfit(calculatedNetProfit);
+
+        // Set report data — use LOCAL computed values so first render is already correct
+        // and no intermediate stale numbers flash
         setReport([
-          { 
-            label: 'Total Sales Revenue', 
-            value: salesRevenue, 
-            type: 'revenue', 
+          {
+            label: 'Total Sales Revenue',
+            value: calculatedSalesRevenue,
+            type: 'revenue',
             trend: revenueTrend
           },
-          { 
-            label: 'Cost of Goods Sold', 
-            value: totalCOGS, 
-            type: 'cogs', 
+          {
+            label: 'Cost of Goods Sold',
+            value: calculatedTotalCOGS,
+            type: 'cogs',
             trend: expenseTrend
           },
-          { 
-            label: 'Gross Profit', 
-            value: grossProfit, 
-            type: 'profit', 
+          {
+            label: 'Gross Profit',
+            value: calculatedGrossProfit,
+            type: 'profit',
             trend: profitTrend
           },
-          { 
-            label: 'Operating Expenses', 
-            value: operatingExpenses, 
-            type: 'expense', 
+          {
+            label: 'Operating Expenses',
+            value: calculatedOperatingExpenses,
+            type: 'expense',
             trend: expenseTrend
           },
-          { 
-            label: 'Net Profit', 
-            value: netProfit, 
-            type: 'profit', 
-            trend: netProfit >= 0 ? (netProfit / Math.abs(netProfit || 1)) * 100 : -((Math.abs(netProfit) / netProfit) * 100)
+          {
+            label: 'Net Profit',
+            value: calculatedNetProfit,
+            type: 'profit',
+            trend: netProfitTrend
           }
         ]);
 
@@ -264,12 +266,14 @@ const Reports = () => {
       } catch (error) {
         console.error('Error loading report:', error);
       } finally {
-        setIsLoading(false);
+        if (reportLoadInFlight.current === myTicket) {
+          setIsLoading(false);
+        }
       }
     };
 
     loadReport();
-  }, [startDate, endDate, user, userProducts, salesRevenue, totalCOGS, grossProfit, operatingExpenses, netProfit, filteredSales]);
+  }, [startDate, endDate, user, userProducts, timeFrame]);
 
   const formatCurrency = (value: number) => {
     return `₦${value.toLocaleString('en-NG', {
@@ -1003,33 +1007,47 @@ const Reports = () => {
 
               {/* Charts */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">Revenue vs Expenses</h3>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <AreaChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-                      <Legend />
-                      <Area type="monotone" dataKey="revenue" stackId="1" stroke="#0088FE" fill="#0088FE" fillOpacity={0.6} />
-                      <Area type="monotone" dataKey="expenses" stackId="1" stroke="#FF8042" fill="#FF8042" fillOpacity={0.6} />
-                    </AreaChart>
-                  </ResponsiveContainer>
+                  <div className="w-full min-h-[300px]">
+                    <ResponsiveContainer width="100%" height={320}>
+                      <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#2563eb" stopOpacity={0.6} />
+                            <stop offset="95%" stopColor="#2563eb" stopOpacity={0.08} />
+                          </linearGradient>
+                          <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#f97316" stopOpacity={0.55} />
+                            <stop offset="95%" stopColor="#f97316" stopOpacity={0.06} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                        <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                        <YAxis tick={{ fontSize: 12 }} />
+                        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                        <Legend />
+                        <Area type="monotone" dataKey="revenue" stroke="#2563eb" strokeWidth={2} fill="url(#colorRevenue)" isAnimationActive={false} />
+                        <Area type="monotone" dataKey="expenses" stroke="#f97316" strokeWidth={2} fill="url(#colorExpenses)" isAnimationActive={false} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">Profit Trend</h3>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-                      <Legend />
-                      <Line type="monotone" dataKey="profit" stroke="#00C49F" strokeWidth={2} dot={{ fill: '#00C49F' }} />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  <div className="w-full min-h-[300px]">
+                    <ResponsiveContainer width="100%" height={320}>
+                      <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                        <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                        <YAxis tick={{ fontSize: 12 }} />
+                        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                        <Legend />
+                        <Line type="monotone" dataKey="profit" stroke="#10b981" strokeWidth={2.5} dot={{ fill: '#10b981', r: 3 }} activeDot={{ r: 5 }} isAnimationActive={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1075,6 +1093,7 @@ const Reports = () => {
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
+                        isAnimationActive={false}
                       >
                         {productPieData.map((_, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -1133,6 +1152,7 @@ const Reports = () => {
                           outerRadius={80}
                           paddingAngle={5}
                           dataKey="value"
+                          isAnimationActive={false}
                         >
                           <Cell fill="#00C49F" />
                           <Cell fill="#FFBB28" />
@@ -1183,9 +1203,9 @@ const Reports = () => {
                     <YAxis />
                     <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                     <Legend />
-                    <Bar dataKey="revenue" fill="#0088FE" name="Revenue" />
-                    <Bar dataKey="expenses" fill="#FF8042" name="Expenses" />
-                    <Bar dataKey="profit" fill="#00C49F" name="Profit" />
+                    <Bar dataKey="revenue" fill="#0088FE" name="Revenue" isAnimationActive={false} />
+                    <Bar dataKey="expenses" fill="#FF8042" name="Expenses" isAnimationActive={false} />
+                    <Bar dataKey="profit" fill="#00C49F" name="Profit" isAnimationActive={false} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

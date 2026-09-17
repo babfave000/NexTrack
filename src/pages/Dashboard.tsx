@@ -37,7 +37,7 @@ type PurchaseOrder = DbPurchaseOrder;
 export default function Dashboard() {
   const { products } = useUserData();
   const { user, isLoading: authLoading } = useAuth();
-  const { settings } = useSettings();
+  const { settings, businessInfo, refreshBusinessInfo } = useSettings();
   const { canInstall, installApp } = usePWAInstall();
   const [installBannerDismissed, setInstallBannerDismissed] = useState<boolean>(() => {
     try {
@@ -83,6 +83,16 @@ export default function Dashboard() {
 
     loadDashboardData();
   }, [user, timeRange, settings.lowStockThreshold]);
+
+  useEffect(() => {
+    const reloadBusinessInfo = () => { void refreshBusinessInfo(); };
+    window.addEventListener('nextrack:profile-saved', reloadBusinessInfo);
+    window.addEventListener('nextrack:profile-synced', reloadBusinessInfo);
+    return () => {
+      window.removeEventListener('nextrack:profile-saved', reloadBusinessInfo);
+      window.removeEventListener('nextrack:profile-synced', reloadBusinessInfo);
+    };
+  }, [refreshBusinessInfo]);
 
   const formatCurrency = (amount: number) =>
     `₦${amount?.toLocaleString('en-NG', { minimumFractionDigits: 2 }) || '0.00'}`;
@@ -142,9 +152,17 @@ export default function Dashboard() {
       {/* Header with Time Filter */}
       <div className="dashboard-heading">
         <div>
-          <p className="dashboard-kicker">Business overview</p>
-          <h1 className="dashboard-title">Good to see you, {user?.name?.split(' ')[0] || 'there'}</h1>
-          <p className="dashboard-subtitle">Here is what is moving across your business today.</p>
+          <p className="dashboard-kicker">{businessInfo?.businessName?.trim() || 'Business overview'}</p>
+          <h1 className="dashboard-title">Good to see you, {businessInfo?.businessName?.split(' ')[0] || 'there'}</h1>
+          <p className="dashboard-subtitle">
+            Here is what is moving across
+            {businessInfo?.businessName?.trim() ? (
+              <> <strong className="font-semibold text-gray-800">{businessInfo.businessName.trim()}</strong> </>
+            ) : (
+              <> your business </>
+            )}
+            today.
+          </p>
         </div>
         <div className="dashboard-heading-actions flex-wrap">
           <Link to="/guideline" className="dashboard-guide-link">Open guide <span aria-hidden="true">↗</span></Link>

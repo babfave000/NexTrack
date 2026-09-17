@@ -138,19 +138,19 @@ export default function SalesPage({ initialTab = 'new' }: SalesPageProps) {
     <div className="max-w-7xl mx-auto px-4 py-6">
       {/* Main Header - Only show when not in form/edit mode */}
       {(viewMode === 'list' || viewMode === 'detail' || viewMode === 'print' || viewMode === 'changeLeft') && (
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+        <div className="sp-header flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Sales Orders</h1>
             <p className="text-gray-600 mt-1">Manage customer orders and invoices</p>
           </div>
           
-          <div className="flex flex-wrap gap-2 items-center">
+          <div className="sp-header-tabs flex flex-wrap gap-2 items-center">
             <button
               onClick={() => {
                 setActiveTab('new');
                 setViewMode('list');
               }}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors min-h-[44px] ${
                 activeTab === 'new' 
                   ? 'bg-blue-600 text-white' 
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -163,7 +163,7 @@ export default function SalesPage({ initialTab = 'new' }: SalesPageProps) {
                 setActiveTab('history');
                 setViewMode('list');
               }}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors min-h-[44px] ${
                 activeTab === 'history' 
                   ? 'bg-blue-600 text-white' 
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -173,7 +173,7 @@ export default function SalesPage({ initialTab = 'new' }: SalesPageProps) {
             </button>
             <button
               onClick={openChangeLeft}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors min-h-[44px] ${
                 activeTab === 'changeLeft' 
                   ? 'bg-blue-600 text-white' 
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -209,7 +209,7 @@ export default function SalesPage({ initialTab = 'new' }: SalesPageProps) {
 
           {/* Filters and Search */}
           <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="sp-filter-row flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
@@ -220,7 +220,7 @@ export default function SalesPage({ initialTab = 'new' }: SalesPageProps) {
                     placeholder="Search orders by customer or ID..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[44px]"
                   />
                 </div>
               </div>
@@ -229,7 +229,7 @@ export default function SalesPage({ initialTab = 'new' }: SalesPageProps) {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white min-h-[44px]"
                 >
                   <option value="all">All Statuses</option>
                   <option value="draft">Draft</option>
@@ -255,9 +255,10 @@ export default function SalesPage({ initialTab = 'new' }: SalesPageProps) {
               </button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className="table-scroll">
+              <div className="overflow-x-auto min-w-[640px]">
+                <table className="w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
@@ -343,6 +344,7 @@ export default function SalesPage({ initialTab = 'new' }: SalesPageProps) {
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           )}
         </div>

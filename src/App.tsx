@@ -1,6 +1,7 @@
 // src/App.tsx
 import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
+import { useSettings } from './hooks/useSettings';
 import Dashboard from './pages/Dashboard';
 import Inventory from './pages/Inventory/InventoryPage';
 import SalesPage from './pages/Sales/SalesPage';
@@ -37,17 +38,20 @@ const MAIN_NAV_LINKS = [
 function NavBar() {
   const { pathname } = useLocation();
   const { user } = useAuth();
+  const { businessInfo } = useSettings();
 
   if (!user) {
     return null;
   }
 
+  const brandName = businessInfo?.businessName?.trim() || 'NexTrack';
+
   return (
     <nav className="app-nav">
       <div className="app-nav-inner">
         <div className="app-nav-brand-row">
-          <Link to="/dashboard" className="app-brand">
-            <span>NexTrack</span>
+          <Link to="/dashboard" className="app-brand" title={brandName}>
+            <span className="truncate max-w-[40vw] sm:max-w-[20rem]">{brandName}</span>
           </Link>
           <div className="app-nav-links" aria-label="Main navigation">
             {MAIN_NAV_LINKS.map(({ path, label }) => {
@@ -94,7 +98,9 @@ function AppContent() {
         <PWAUpdateNotification />
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<WelcomePage />} />
+          <Route path="/" element={
+            user ? <Navigate to="/dashboard" replace /> : <WelcomePage />
+          } />
           <Route 
             path="/login" 
             element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} 
