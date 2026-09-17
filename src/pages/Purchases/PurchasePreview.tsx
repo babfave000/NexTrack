@@ -41,8 +41,9 @@ export default function PurchasePreview({ order }: PurchasePreviewProps) {
 
   return (
     <div
-      className="bg-white shadow p-6 rounded print:p-0 print:shadow-none print:bg-white"
+      className="print-slip bg-white shadow p-6 rounded print:p-0 print:shadow-none print:bg-white"
       aria-label="Purchase Order Preview"
+      style={{ fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif' }}
     >
       {/* Header Info */}
       <div className="mb-6 space-y-1">
@@ -97,11 +98,11 @@ export default function PurchasePreview({ order }: PurchasePreviewProps) {
         Total: {formatCurrency(order.total)}
       </div>
 
-      {/* Print Button */}
-      <div className="mt-6 text-center print:hidden">
+      {/* Print Button — on-screen only, never on paper */}
+      <div className="print-hidden mt-6 text-center">
         <button
-          onClick={() => window.print()}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          onClick={() => { try { window.focus(); window.print(); } catch { /* noop */ } }}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded min-h-[44px]"
           aria-label="Print Purchase Order"
         >
           🖨️ Print Purchase Order

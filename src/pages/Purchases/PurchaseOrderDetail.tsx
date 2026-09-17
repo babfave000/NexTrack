@@ -96,10 +96,10 @@ export default function PurchaseOrderDetail({ poId, onBack, userId }: Props) {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+      <div className="print-hidden flex items-center justify-between mb-6">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors min-h-[44px]"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
@@ -122,7 +122,7 @@ export default function PurchaseOrderDetail({ poId, onBack, userId }: Props) {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
+        <div className="print-hidden bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white">
           <h1 className="text-2xl font-bold mb-2">💰 Purchase Order Details</h1>
           <p className="text-blue-100">Supplier order information and item breakdown</p>
         </div>
@@ -132,11 +132,11 @@ export default function PurchaseOrderDetail({ poId, onBack, userId }: Props) {
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="mt-6 flex justify-end gap-3">
+      {/* Action Buttons — on screen only, never on paper */}
+      <div className="print-hidden mt-6 flex justify-end gap-3">
         <button
-          onClick={() => window.print()}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+          onClick={() => { try { window.focus(); window.print(); } catch { /* noop */ } }}
+          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2 min-h-[44px]"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2z" />
@@ -146,7 +146,7 @@ export default function PurchaseOrderDetail({ poId, onBack, userId }: Props) {
         
         <button
           onClick={onBack}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors min-h-[44px]"
         >
           Close
         </button>

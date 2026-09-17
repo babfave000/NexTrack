@@ -233,10 +233,72 @@ select:focus {
 /*                 Print Utility Classes               */
 /* --------------------------------------------------- */
 
+/* Global print contract:
+   - The whole app chrome (nav, footer, toasts, sidebar, filters, buttons)
+     is hidden on print by default.
+   - Only a container marked `.print-slip` (and its descendants) prints,
+     styled as a single portrait A4 invoice slip.
+   - Add the class `print-hidden` to any block that should never print
+     (action bar, filter row, banner, etc.) even on a slip page.
+   - Add the class `print-visible` to any nested block that must force
+     display inside the slip. */
+
+@page {
+  size: A4 portrait;
+  margin: 12mm 10mm 12mm 10mm;
+}
+
 @media print {
-  .print-hidden {
-    display: none !important;
+  html,
+  body {
+    width: 210mm;
+    height: 297mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
+
+  /* Nuke every top-level node first — the slip is the only survivor. */
+  body * {
+    visibility: hidden;
+  }
+
+  .print-slip,
+  .print-slip * {
+    visibility: visible;
+  }
+
+  .print-slip {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 190mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    page-break-after: avoid;
+    page-break-inside: auto;
+  }
+
+  /* Safety net for anything marked explicitly hidden */
+  .print-hidden,
+  .no-print {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  .print-visible {
+    display: initial !important;
+    visibility: visible !important;
+  }
+
   .print-block {
     display: block !important;
   }
@@ -260,6 +322,37 @@ select:focus {
   }
   .print-border {
     border: 1px solid #e5e7eb !important;
+  }
+  .print-break-before {
+    page-break-before: always;
+  }
+  .print-break-after {
+    page-break-after: always;
+  }
+  .print-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+
+  /* Hide toasts, PWAs, banners, modals */
+  .Toastify,
+  .Toastify__toast-container,
+  .pwa-update-root,
+  #pwa-update,
+  .app-nav,
+  .app-nav-inner,
+  nav,
+  header,
+  footer,
+  aside,
+  .toast-container,
+  [data-testid='toast'] {
+    display: none !important;
+  }
+
+  /* Don't print link decorations/URLs */
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
   }
 }
 

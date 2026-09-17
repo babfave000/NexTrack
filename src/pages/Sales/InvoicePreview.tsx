@@ -31,7 +31,10 @@ export default function InvoicePreview({ order }: { order: SalesOrder }) {
   const total = order.total ?? calculatedTotal;
 
   return (
-    <div className="bg-white shadow p-6 rounded print:p-0 print:shadow-none print:bg-white text-sm md:text-base">
+    <div
+      className="print-slip bg-white shadow p-6 rounded print:p-0 print:shadow-none print:bg-white text-sm md:text-base"
+      style={{ fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif' }}
+    >
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-blue-700">NexTrack</h1>
@@ -82,11 +85,11 @@ export default function InvoicePreview({ order }: { order: SalesOrder }) {
         Total: {formatCurrency(total)}
       </div>
 
-      {/* Print Button */}
-      <div className="mt-6 text-center print:hidden">
+      {/* Print Button — only on screen, never on paper */}
+      <div className="print-hidden mt-6 text-center">
         <button
-          onClick={() => window.print()}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded shadow transition"
+          onClick={() => { try { window.focus(); window.print(); } catch { /* noop */ } }}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded shadow transition min-h-[44px]"
         >
           🖨️ Print Invoice
         </button>

@@ -30,7 +30,10 @@ export default function InvoiceOrder({ order }: { order: SalesOrder }) {
   const total = order.total ?? calculatedTotal;
 
   return (
-    <div className="bg-white shadow-md rounded p-6 text-sm md:text-base print:bg-white print:shadow-none">
+    <div
+      className="print-slip bg-white shadow-md rounded p-6 text-sm md:text-base print:bg-white print:shadow-none"
+      style={{ fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif' }}
+    >
       {/* Header */}
       <header className="mb-6">
         <div className="flex justify-between items-start">
@@ -89,11 +92,11 @@ export default function InvoiceOrder({ order }: { order: SalesOrder }) {
         Total: {formatCurrency(total)}
       </div>
 
-      {/* Print Button */}
-      <div className="mt-6 text-center print:hidden">
+      {/* Print Button — only shown on screen, never on paper */}
+      <div className="print-hidden mt-6 text-center">
         <button
-          onClick={() => window.print()}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded transition"
+          onClick={() => { try { window.focus(); window.print(); } catch { /* noop */ } }}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded transition min-h-[44px]"
         >
           🖨️ Print Invoice
         </button>
