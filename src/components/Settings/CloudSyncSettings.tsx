@@ -519,7 +519,7 @@ export default function CloudSyncSettings() {
           </div>
         )}
 
-        {/* Troubleshooting Tips */}
+        {/* Troubleshooting Tips 
         {status.lastError && (
           <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
             <h4 className="font-medium text-orange-800 mb-2">Troubleshooting Tips</h4>
@@ -531,7 +531,7 @@ export default function CloudSyncSettings() {
               <li>Check browser console (F12) for detailed error messages</li>
             </ul>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
