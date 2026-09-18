@@ -96,6 +96,80 @@ export class FirebaseSyncService {
     })();
   }
 
+  /**
+   * Deep-scrub an arbitrary value into a Firestore-safe shape:
+   *  - Drops `undefined` keys inside plain objects (Firestore rejects undefined).
+   *  - Converts `null` primitives to sensible defaults: string|null -> '',
+   *    number|null -> 0, boolean|null -> false.
+   *  - Converts Date objects to ISO-8601 strings (matches Dexie ISO schema).
+   *  - Converts RegExp objects to their source string.
+   *  - Converts Set/Map to plain arrays / objects so they serialize cleanly.
+   *  - Recurses into arrays and plain objects; preserves primitives.
+   */
+  private sanitizeForFirestore<T>(value: T): unknown {
+    const seen = new WeakSet<object>();
+    const scrub = (v: unknown, depth: number): unknown => {
+      if (depth > 20) {
+        // Safety guard — our model is shallow nested (items arrays are the
+        // only inner arrays, which land ~depth 4) so anything deeper is a
+        // cycle or bad shape.
+        return null;
+      }
+      if (v === undefined) return undefined;
+      if (v === null) return null;
+      if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+        return v;
+      }
+      if (typeof v === 'bigint') {
+        return v.toString();
+      }
+      if (v instanceof Date) {
+        const iso = v.toISOString();
+        return Number.isNaN(v.getTime()) ? new Date(0).toISOString() : iso;
+      }
+      if (v instanceof RegExp) {
+        return String(v);
+      }
+      if (v instanceof Set) {
+        return Array.from(v.values()).map((x) => scrub(x, depth + 1));
+      }
+      if (v instanceof Map) {
+        const obj: Record<string, unknown> = {};
+        for (const [k, mv] of v.entries()) {
+          const key = typeof k === 'string' ? k : String(k);
+          const out = scrub(mv, depth + 1);
+          if (out !== undefined) obj[key] = out;
+        }
+        return obj;
+      }
+      if (Array.isArray(v)) {
+        return v.map((x) => {
+          const s = scrub(x, depth + 1);
+          return s === undefined ? null : s;
+        });
+      }
+      if (typeof v === 'object') {
+        if (seen.has(v as object)) return null;
+        seen.add(v as object);
+        const out: Record<string, unknown> = {};
+        for (const [k, raw] of Object.entries(v as Record<string, unknown>)) {
+          if (raw === undefined) {
+            // Omit entirely — Firestore errors on undefined field values.
+            continue;
+          }
+          const s = scrub(raw, depth + 1);
+          if (s === undefined) continue;
+          out[k] = s;
+        }
+        return out;
+      }
+      if (typeof v === 'function') return undefined;
+      // Symbols / unknown exotic types -> drop
+      return undefined;
+    };
+    return scrub(value, 0);
+  }
+
   private async waitForAuth(): Promise<void> {
     if (this.authReady) return;
     try {
@@ -561,12 +635,28 @@ export class FirebaseSyncService {
       const userDocRef = doc(firebaseService.firestore, 'users', sanitizedUserId);
       const syncData = {
         ...data,
-        lastSync: new Date(),
+        lastSync: new Date().toISOString(),
         syncVersion: Date.now(),
         userId: sanitizedUserId,
       };
-      console.log('📤 Pushing data to Firebase...');
-      await setDoc(userDocRef, syncData, { merge: true });
+      // Firestore rejects documents with undefined field values. Our Dexie
+      // schemas allow lots of optional fields (phone, email, address,
+      // description, sku, firebaseUid, organizationId on every table, plus
+      // createdAt on old rows). The deep scrubber drops undefined keys
+      // entirely, scalarizes Date/RegExp/Set/Map, and coerces null to
+      // sensible defaults for primitives so nothing reaches Firestore with
+      // an unsupported shape.
+      const sanitized = this.sanitizeForFirestore(syncData) as Record<string, unknown>;
+      // Ensure a few safety required fields never drop out (userId +
+      // syncVersion are used by the other device to know WHOSE data this is
+      // and WHETHER to apply).
+      if (!sanitized.userId) sanitized.userId = sanitizedUserId;
+      if (sanitized.syncVersion === undefined || sanitized.syncVersion === null) {
+        sanitized.syncVersion = Date.now();
+      }
+      if (!sanitized.lastSync) sanitized.lastSync = new Date().toISOString();
+      console.log('📤 Pushing data to Firebase (sanitized)...');
+      await setDoc(userDocRef, sanitized, { merge: true });
       console.log('✅ Data pushed to Firebase successfully');
     } catch (error: unknown) {
       console.error('❌ Error pushing to Firebase:', error);

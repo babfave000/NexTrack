@@ -1,99 +1,37 @@
 // src/pages/Sales/InvoicePreview.tsx
+//
+// Preview wrapper used by SalesOrderDetail and (optionally) SalesForm.
+// Layout lives entirely in <InvoiceOrder />; this component only:
+//   (1) Ensures the order has a sensible shape for the canonical renderer,
+//   (2) Forwards showPrintButton (default true) to the renderer.
 
+import InvoiceOrder from './InvoiceOrder';
 
 interface InvoiceItem {
   product: string;
+  productName?: string;
   quantity: number;
-  price: number;
+  unitPrice: number;
+  price?: number;
   total?: number;
 }
 
 interface SalesOrder {
-  id: number;
+  id: number | string;
   customer?: string;
   date: string;
   items: InvoiceItem[];
   total?: number;
+  status?: string;
+  paymentStatus?: string;
+  notes?: string;
 }
 
-const formatCurrency = (amount: number): string =>
-  new Intl.NumberFormat('en-NG', {
-    style: 'currency',
-    currency: 'NGN',
-    minimumFractionDigits: 2,
-  }).format(amount);
+interface InvoicePreviewProps {
+  order: SalesOrder;
+  showPrintButton?: boolean;
+}
 
-export default function InvoicePreview({ order }: { order: SalesOrder }) {
-  const calculatedTotal = order.items.reduce(
-    (sum, item) => sum + item.quantity * item.price,
-    0
-  );
-  const total = order.total ?? calculatedTotal;
-
-  return (
-    <div
-      className="print-slip bg-white shadow p-6 rounded print:p-0 print:shadow-none print:bg-white text-sm md:text-base"
-      style={{ fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif' }}
-    >
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-blue-700">NexTrack</h1>
-        <p className="text-gray-600">Smart Business Tracker</p>
-
-        <div className="mt-4 space-y-1 text-sm">
-          <div>
-            <strong>Date:</strong>{' '}
-            {order.date ? new Date(order.date).toLocaleDateString() : '—'}
-          </div>
-          <div>
-            <strong>Invoice #:</strong> {order.id ?? '—'}
-          </div>
-          <div>
-            <strong>Customer:</strong> {order.customer || '—'}
-          </div>
-        </div>
-      </div>
-
-      {/* Item Table */}
-      <table className="w-full border mb-6">
-        <thead className="bg-gray-100 text-left">
-          <tr>
-            <th className="border p-2">Product</th>
-            <th className="border p-2 text-center">Qty</th>
-            <th className="border p-2 text-right">Unit Price</th>
-            <th className="border p-2 text-right">Subtotal</th>
-          </tr>
-        </thead>
-        <tbody>
-          {order.items.map((item, index) => (
-            <tr key={index} className="hover:bg-gray-50">
-              <td className="border p-2">{item.product}</td>
-              <td className="border p-2 text-center">{item.quantity}</td>
-              <td className="border p-2 text-right">
-                {formatCurrency(item.price)}
-              </td>
-              <td className="border p-2 text-right">
-                {formatCurrency(item.quantity * item.price)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Total */}
-      <div className="text-right text-lg font-semibold">
-        Total: {formatCurrency(total)}
-      </div>
-
-      {/* Print Button — only on screen, never on paper */}
-      <div className="print-hidden mt-6 text-center">
-        <button
-          onClick={() => { try { window.focus(); window.print(); } catch { /* noop */ } }}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded shadow transition min-h-[44px]"
-        >
-          🖨️ Print Invoice
-        </button>
-      </div>
-    </div>
-  );
+export default function InvoicePreview({ order, showPrintButton = true }: InvoicePreviewProps) {
+  return <InvoiceOrder order={order} showPrintButton={showPrintButton} />;
 }

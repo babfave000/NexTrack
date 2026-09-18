@@ -1,15 +1,13 @@
 // src/pages/Sales/SalesDetail.tsx
 
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../db/dexie';
-import { format } from 'date-fns';
-
-const formatCurrency = (amount: number) =>
-  `₦${amount.toLocaleString('en-NG', { minimumFractionDigits: 2 })}`;
+import InvoiceOrder from './InvoiceOrder';
 
 const SalesDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const order = useLiveQuery(() => db.salesOrders.get(Number(id)), [id]);
 
   if (!order) {
@@ -26,113 +24,77 @@ const SalesDetail = () => {
     );
   }
 
-  const total = order.items?.reduce((sum, i) => sum + (i.total ?? 0), 0) ?? 0;
-
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Sales Order #{order.id}</h1>
-        <div className="space-x-3">
+    <div className="p-4 sm:p-6 max-w-5xl mx-auto">
+      {/* Top action bar — on screen only, never on paper */}
+      <div className="print-hidden flex flex-wrap justify-between items-center gap-3 mb-5">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="min-h-[44px] px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-medium transition"
+        >
+          Back
+        </button>
+
+        <div className="flex flex-wrap items-center gap-3">
           <Link
             to={`/sales/${order.id}/edit`}
-            className="text-yellow-600 hover:underline"
+            className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-lg border border-yellow-200 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 font-medium transition"
           >
             Edit
           </Link>
           <Link
             to={`/sales/${order.id}/print`}
-            className="text-blue-600 hover:underline"
             target="_blank"
             rel="noopener noreferrer"
+            className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-lg border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium transition"
           >
-            Print
+            Open print view
           </Link>
+          <button
+            type="button"
+            onClick={() => {
+              try {
+                window.focus();
+                window.print();
+              } catch {
+                /* noop */
+              }
+            }}
+            className="inline-flex items-center gap-2 min-h-[44px] px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm transition"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M17 17h2a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2h2M7 21h10a2 2 0 002-2v-4a2 2 0 00-2-2H7a2 2 0 00-2 2v4a2 2 0 002 2z"
+              />
+            </svg>
+            Print Invoice
+          </button>
         </div>
       </div>
 
-      {/* Order Summary */}
-      <div className="bg-white shadow p-6 rounded-md border">
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <p>
-            <strong>Date:</strong>{' '}
-            {order.date ? format(new Date(order.date), 'yyyy-MM-dd') : '—'}
-          </p>
-          <p>
-            <strong>Customer:</strong> {order.customer || '—'}
-          </p>
-          <p>
-            <strong>Status:</strong>{' '}
-            <span
-              className={`ml-2 font-semibold ${
-                order.status === 'approved'
-                  ? 'text-green-600'
-                  : order.status === 'draft'
-                  ? 'text-gray-600'
-                  : 'text-blue-600'
-              }`}
-            >
-              {order.status}
-            </span>
-          </p>
-          <p>
-            <strong>Payment Status:</strong>{' '}
-            <span
-              className={`ml-2 ${
-                order.paymentStatus === 'paid'
-                  ? 'text-green-600'
-                  : order.paymentStatus === 'partially_paid'
-                  ? 'text-yellow-600'
-                  : 'text-red-600'
-              }`}
-            >
-              {order.paymentStatus}
-            </span>
-          </p>
-          <p className="col-span-2">
-            <strong>Notes:</strong> {order.notes || '—'}
-          </p>
-        </div>
-
-        {/* Product Table */}
-        <h2 className="text-xl font-semibold mt-8 mb-2">Products</h2>
-        {order.items?.length > 0 ? (
-          <table className="w-full text-sm border-t">
-            <thead>
-              <tr className="bg-gray-100 text-left">
-                <th className="p-2">Product</th>
-                <th className="p-2 text-right">Qty</th>
-                <th className="p-2 text-right">Unit Price (₦)</th>
-                <th className="p-2 text-right">Total (₦)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {order.items.map((item, idx) => (
-                <tr key={idx} className="border-t">
-                  <td className="p-2">{item.productName}</td>
-                  <td className="p-2 text-right">{item.quantity}</td>
-                  <td className="p-2 text-right">{formatCurrency(item.unitPrice)}</td>
-                  <td className="p-2 text-right">{formatCurrency(item.total)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-gray-500 mt-4">No products listed for this order.</p>
-        )}
-
-        {/* Total */}
-        <div className="text-right mt-6">
-          <p className="text-lg font-bold">Total: {formatCurrency(total)}</p>
-        </div>
-
-        {/* Stock note */}
-        {order.status === 'approved' && (
-          <p className="mt-4 text-green-600 text-sm">
-            ✅ Stock has been deducted for this order.
-          </p>
-        )}
-      </div>
+      <InvoiceOrder
+        order={{
+          id: order.id ?? 0,
+          customer: order.customer,
+          date: order.date,
+          items: order.items,
+          total: order.total,
+          status: order.status,
+          paymentStatus: order.paymentStatus,
+          notes: order.notes,
+        }}
+        showPrintButton={false}
+      />
     </div>
   );
 };
