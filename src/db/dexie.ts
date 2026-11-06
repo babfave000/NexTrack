@@ -15,6 +15,8 @@ export interface User {
   name: string;
   role: UserRole;
   firebaseUid?: string;
+  /** Stable cloud identity, generated on the client so records can be created offline. */
+  uuid?: string;
   createdAt: Date;
   updatedAt: Date;
 }
